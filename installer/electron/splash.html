@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 480px; height: 320px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    font-family: 'Segoe UI', sans-serif;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    overflow: hidden;
+    -webkit-app-region: drag;
+    user-select: none;
+  }
+
+  .logo-wrap {
+    margin-bottom: 20px;
+  }
+
+  .logo-circle {
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, #e94560, #0f3460);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px;
+    box-shadow: 0 8px 32px rgba(233,69,96,0.4);
+    margin: 0 auto 12px;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #fff;
+  }
+
+  .subtitle {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .divider {
+    width: 60px; height: 2px;
+    background: linear-gradient(90deg, transparent, #e94560, transparent);
+    margin: 20px auto;
+  }
+
+  .status-text {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    min-height: 20px;
+    text-align: center;
+    padding: 0 40px;
+    transition: all 0.3s;
+  }
+
+  .progress-track {
+    width: 300px;
+    height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    margin-top: 16px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #e94560, #533483);
+    border-radius: 2px;
+    width: 0%;
+    animation: loading 8s ease-in-out infinite;
+  }
+
+  @keyframes loading {
+    0%   { width: 5%; }
+    20%  { width: 30%; }
+    50%  { width: 60%; }
+    80%  { width: 85%; }
+    100% { width: 95%; }
+  }
+
+  .error-box {
+    display: none;
+    background: rgba(233,69,96,0.15);
+    border: 1px solid rgba(233,69,96,0.4);
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin-top: 12px;
+    font-size: 12px;
+    color: #e94560;
+    text-align: center;
+    max-width: 380px;
+  }
+
+  .version {
+    position: absolute;
+    bottom: 12px;
+    right: 16px;
+    font-size: 10px;
+    color: rgba(255,255,255,0.25);
+  }
+</style>
+</head>
+<body>
+  <div class="logo-wrap">
+    <div class="logo-circle">🛒</div>
+    <h1>QPOS</h1>
+    <p class="subtitle">Point of Sale System</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <p class="status-text" id="status">Starting up...</p>
+
+  <div class="progress-track">
+    <div class="progress-bar" id="bar"></div>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <span class="version">v1.0.0 &nbsp;|&nbsp; Alkyne Solutions</span>
+
+<script>
+  if (window.qpos) {
+    window.qpos.onStatus((msg) => {
+      document.getElementById('status').textContent = msg;
+    });
+    window.qpos.onError((msg) => {
+      document.getElementById('status').textContent = 'Failed to start QPOS';
+      const eb = document.getElementById('errorBox');
+      eb.style.display = 'block';
+      eb.textContent = 'Error: ' + msg + '\n\nPlease contact support.';
+      document.getElementById('bar').style.animation = 'none';
+      document.getElementById('bar').style.background = '#e94560';
+      document.getElementById('bar').style.width = '100%';
+    });
+  }
+</script>
+</body>
+</html>

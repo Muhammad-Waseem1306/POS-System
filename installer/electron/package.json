@@ -1,0 +1,78 @@
+{
+  "name": "qpos",
+  "version": "1.0.0",
+  "description": "QPOS - Point of Sale System by Alkyne Solutions",
+  "main": "main.js",
+  "author": "Alkyne Solutions",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-packager . QPOS --platform=win32 --arch=x64 --out=C:\\QPOS_Output\\electron\\packaged --overwrite --asar=false --icon=assets/icon.png --app-version=1.0.0 --ignore=node_modules/electron-builder --ignore=node_modules/electron-packager"
+  },
+  "devDependencies": {
+    "@electron/asar": "^4.2.0",
+    "electron": "^28.3.3",
+    "electron-builder": "^24.13.3",
+    "electron-packager": "^17.1.2"
+  },
+  "build": {
+    "appId": "com.alkyne.qpos",
+    "productName": "QPOS",
+    "copyright": "Alkyne Solutions",
+    "directories": {
+      "output": "C:\\QPOS_Output\\electron"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.png",
+      "requestedExecutionLevel": "requireAdministrator",
+      "sign": null,
+      "signingHashAlgorithms": null
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": false,
+      "perMachine": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "QPOS",
+      "runAfterFinish": true
+    },
+    "extraResources": [
+      {
+        "from": "C:\\QPOS_Build\\php8.1",
+        "to": "php",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "C:\\QPOS_Build\\mariadb",
+        "to": "mariadb",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "C:\\Users\\Usama Imran\\POS system\\pos for electronics",
+        "to": "laravel",
+        "filter": [
+          "**/*",
+          "!.git/**",
+          "!node_modules/**",
+          "!installer/**",
+          "!.env",
+          "!*.log",
+          "!storage/framework/cache/**",
+          "!storage/framework/sessions/**",
+          "!storage/framework/views/**",
+          "!storage/logs/**"
+        ]
+      }
+    ],
+    "asarUnpack": [
+      "**/*.exe",
+      "**/*.dll",
+      "**/*.so"
+    ]
+  }
+}

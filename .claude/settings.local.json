@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Recurse -Force)",
+      "Bash(Select-Object FullName)",
+      "Bash(php artisan *)",
+      "Bash(rm -rf \"C:/QPOS/mariadb/data/\"* && echo \"Cleared\" && ls \"C:/QPOS/mariadb/data/\")",
+      "PowerShell(& \"C:\\\\QPOS\\\\php\\\\php.exe\" \"C:\\\\QPOS\\\\app\\\\artisan\" db:seed --force 2>&1)",
+      "PowerShell(& \"C:\\\\QPOS\\\\php\\\\php.exe\" \"C:\\\\QPOS\\\\app\\\\artisan\" storage:link 2>&1)",
+      "PowerShell(& \"C:\\\\QPOS\\\\php\\\\php.exe\" \"C:\\\\QPOS\\\\app\\\\artisan\" optimize:clear 2>&1)"
+    ]
+  }
+}
