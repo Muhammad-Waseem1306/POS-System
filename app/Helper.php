@@ -130,3 +130,10 @@ if (!function_exists('demoUserCheck')) {
         return false;
     }
 }
+
+if (!function_exists('table_actions')) {
+    function table_actions(): \App\Support\TableActions
+    {
+        return \App\Support\TableActions::make();
+    }
+}

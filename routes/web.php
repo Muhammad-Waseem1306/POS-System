@@ -64,6 +64,8 @@ Route::match(['get', 'post'], 'forget-password', [AuthController::class, 'forget
 Route::match(['get', 'post'], 'new-password', [AuthController::class, 'newPassword'])->name('new.password');
 Route::match(['get', 'post'], 'password-reset', [AuthController::class, 'resetPassword'])->name('password.reset');
 Route::get('resend-otp', [AuthController::class, 'resendOtp'])->name('resend.otp');
+Route::redirect('login-otp', '/login')->name('login.otp');
+Route::redirect('resend-login-otp', '/login')->name('resend.login.otp');
 
 // google auth
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('auth.google');
