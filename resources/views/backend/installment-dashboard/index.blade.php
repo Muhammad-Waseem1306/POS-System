@@ -3,95 +3,71 @@
 @section('title', 'Installment Dashboard')
 
 @section('content')
-<section class="content">
-    <div class="container-fluid">
-
-        <div class="row">
-            <div class="col-md-3">
-                <div class="small-box bg-danger">
-                    <div class="inner">
-                        <h3>{{ $stats['overdue'] }}</h3>
-                        <p>Overdue Installments</p>
-                        <small>{{ currency()->symbol ?? '' }}{{ number_format($stats['overdue_amount'], 2) }} total</small>
-                    </div>
-                    <div class="icon"><i class="fas fa-exclamation-circle"></i></div>
-                    <a href="{{ route('backend.admin.installment-dashboard.overdue') }}" class="small-box-footer">
-                        View <i class="fas fa-arrow-circle-right"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="small-box bg-warning">
-                    <div class="inner">
-                        <h3>{{ $stats['due_today'] }}</h3>
-                        <p>Due Today</p>
-                        <small>{{ currency()->symbol ?? '' }}{{ number_format($stats['due_today_amount'], 2) }} total</small>
-                    </div>
-                    <div class="icon"><i class="fas fa-calendar-day"></i></div>
-                    <a href="{{ route('backend.admin.installment-dashboard.due-today') }}" class="small-box-footer">
-                        View <i class="fas fa-arrow-circle-right"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="small-box bg-info">
-                    <div class="inner">
-                        <h3>{{ $stats['upcoming_7'] }}</h3>
-                        <p>Due Next 7 Days</p>
-                    </div>
-                    <div class="icon"><i class="fas fa-calendar-week"></i></div>
-                    <a href="{{ route('backend.admin.installment-dashboard.upcoming') }}?days=7" class="small-box-footer">
-                        View <i class="fas fa-arrow-circle-right"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="small-box bg-primary">
-                    <div class="inner">
-                        <h3>{{ $stats['upcoming_30'] }}</h3>
-                        <p>Due Next 30 Days</p>
-                    </div>
-                    <div class="icon"><i class="fas fa-calendar-alt"></i></div>
-                    <a href="{{ route('backend.admin.installment-dashboard.upcoming') }}?days=30" class="small-box-footer">
-                        View <i class="fas fa-arrow-circle-right"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card card-danger card-outline">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-exclamation-circle text-danger"></i> Overdue Installments</h3>
-                        <div class="card-tools">
-                            <a href="{{ route('backend.admin.installment-dashboard.overdue') }}" class="btn btn-sm btn-danger">
-                                View All Overdue
-                            </a>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                        <table class="table table-sm table-striped" id="overduePreview" style="min-width:750px">
-                            <thead>
-                                <tr><th>#</th><th>Customer</th><th>Phone</th><th>Plan</th><th>Inst#</th><th>Due Date</th><th>Amount</th><th>Days Overdue</th><th>Action</th></tr>
-                            </thead>
-                        </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+<div class="dashboard-modern">
+    <div class="stat-cards-row">
+        <x-stat-card
+            :value="$stats['overdue']"
+            label="Overdue Installments"
+            :subtitle="(currency()->symbol ?? '') . number_format($stats['overdue_amount'], 2) . ' total'"
+            :href="route('backend.admin.installment-dashboard.overdue')"
+            icon="fas fa-exclamation-circle"
+            variant="rose"
+        />
+        <x-stat-card
+            :value="$stats['due_today']"
+            label="Due Today"
+            :subtitle="(currency()->symbol ?? '') . number_format($stats['due_today_amount'], 2) . ' total'"
+            :href="route('backend.admin.installment-dashboard.due-today')"
+            icon="fas fa-calendar-day"
+            variant="amber"
+        />
+        <x-stat-card
+            :value="$stats['upcoming_7']"
+            label="Due Next 7 Days"
+            :href="route('backend.admin.installment-dashboard.upcoming') . '?days=7'"
+            icon="fas fa-calendar-week"
+            variant="blue"
+        />
+        <x-stat-card
+            :value="$stats['upcoming_30']"
+            label="Due Next 30 Days"
+            :href="route('backend.admin.installment-dashboard.upcoming') . '?days=30'"
+            icon="fas fa-calendar-alt"
+            variant="green"
+        />
     </div>
-</section>
+
+    <x-table-panel title="Overdue Installments" icon="fas fa-exclamation-circle" accent="danger">
+        <x-slot:tools>
+            <a href="{{ route('backend.admin.installment-dashboard.overdue') }}" class="btn btn-modern btn-modern--danger btn-modern--sm">
+                View All Overdue
+            </a>
+        </x-slot:tools>
+        <table class="table table-modern table-striped w-100" id="overduePreview">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Customer</th>
+                    <th>Phone</th>
+                    <th>Plan</th>
+                    <th>Inst#</th>
+                    <th>Due Date</th>
+                    <th>Amount</th>
+                    <th>Days Overdue</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+        </table>
+    </x-table-panel>
+</div>
 @endsection
 
 @push('scripts')
 <script>
 $(function() {
-    $('#overduePreview').DataTable({
-        processing: true, serverSide: true,
+    initModernDataTable('#overduePreview', {
+        processing: true,
+        serverSide: true,
         ajax: '{{ route("backend.admin.installment-dashboard.overdue") }}',
         columns: [
             { data: 'DT_RowIndex' },

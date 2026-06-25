@@ -1,51 +1,28 @@
 @extends('backend.master')
 
-@section('title', 'Update Currency')
+@section('title', 'Edit Currency')
 
 @section('content')
-<div class="card">
-  <div class="card-body">
-    <form action="{{ route('backend.admin.currencies.update',$currency->id) }}" method="post" class="accountForm"
-      enctype="multipart/form-data">
-      @csrf
-      @method('PUT')
-      <div class="card-body">
-        <div class="row">
-          <div class="mb-3 col-md-6">
-            <label for="name" class="form-label">
-              Name
-              <span class="text-danger">*</span>
-            </label>
-            <input type="text" class="form-control" placeholder="Enter name" name="name"
-              value="{{ old('name',$currency->name) }}" required>
-          </div>
-          <div class="mb-3 col-md-6">
-            <label for="code" class="form-label">
-              Code
-              <span class="text-danger">*</span>
-            </label>
-            <input type="text" class="form-control" placeholder="Enter Short cod" name="code"
-              value="{{ old('code',$currency->code) }}" required>
-          </div>
-          <div class="mb-3 col-md-6">
-            <label for="symbol" class="form-label">
-              Symbol
-              <span class="text-danger">*</span>
-            </label>
-            <input type="text" class="form-control" placeholder="Enter symbol" name="symbol"
-              value="{{ old('symbol',$currency->symbol) }}" required>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6">
-            <button type="submit" class="btn bg-gradient-primary">Update</button>
-          </div>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
+<x-form-page
+    :action="route('backend.admin.currencies.update', $currency->id)"
+    method="PUT"
+    :cancel-url="route('backend.admin.currencies.index')"
+    submit-label="Update Currency"
+    enctype="multipart/form-data"
+>
+    <x-form-section title="Currency Details">
+        <x-form-field label="Name" name="name" required>
+            <input type="text" class="form-control" id="name" placeholder="e.g. US Dollar" name="name"
+                value="{{ old('name', $currency->name) }}" required>
+        </x-form-field>
+        <x-form-field label="Code" name="code" required>
+            <input type="text" class="form-control" id="code" placeholder="e.g. USD" name="code"
+                value="{{ old('code', $currency->code) }}" required>
+        </x-form-field>
+        <x-form-field label="Symbol" name="symbol" required>
+            <input type="text" class="form-control" id="symbol" placeholder="e.g. $" name="symbol"
+                value="{{ old('symbol', $currency->symbol) }}" required>
+        </x-form-field>
+    </x-form-section>
+</x-form-page>
 @endsection
-@push('script')
-<script src="{{ asset('js/image-field.js') }}"></script>
-@endpush

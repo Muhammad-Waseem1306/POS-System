@@ -3,83 +3,75 @@
 @section('title', 'Audit Logs')
 
 @section('content')
-<section class="content">
-    <div class="container-fluid">
-
-        {{-- Filters --}}
-        <div class="card card-primary card-outline">
-            <div class="card-header"><h3 class="card-title"><i class="fas fa-filter"></i> Filters</h3></div>
-            <div class="card-body">
-                <div class="row" id="auditFilters">
-                    <div class="col-md-2">
-                        <select class="form-control form-control-sm" id="filterAction">
-                            <option value="">All Actions</option>
-                            @foreach($actions as $action)
-                            <option value="{{ $action }}">{{ ucfirst(str_replace('_',' ',$action)) }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <select class="form-control form-control-sm" id="filterModule">
-                            <option value="">All Modules</option>
-                            @foreach($modules as $module)
-                            <option value="{{ $module }}">{{ ucfirst($module) }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <select class="form-control form-control-sm" id="filterUser">
-                            <option value="">All Users</option>
-                            @foreach($users as $user)
-                            <option value="{{ $user->id }}">{{ $user->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <input type="date" class="form-control form-control-sm" id="filterDateFrom" placeholder="From Date">
-                    </div>
-                    <div class="col-md-2">
-                        <input type="date" class="form-control form-control-sm" id="filterDateTo" placeholder="To Date">
-                    </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-secondary btn-sm" id="clearFilters"><i class="fas fa-times"></i> Clear</button>
-                    </div>
-                </div>
+<div class="filter-bar mb-4">
+    <div class="filter-bar__form">
+        <div class="filter-bar__grid filter-bar__grid--compact" id="auditFilters">
+            <div class="filter-bar__field">
+                <label class="form-label" for="filterAction">Action</label>
+                <select class="form-control form-control-sm" id="filterAction">
+                    <option value="">All Actions</option>
+                    @foreach($actions as $action)
+                    <option value="{{ $action }}">{{ ucfirst(str_replace('_',' ',$action)) }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="filter-bar__field">
+                <label class="form-label" for="filterModule">Module</label>
+                <select class="form-control form-control-sm" id="filterModule">
+                    <option value="">All Modules</option>
+                    @foreach($modules as $module)
+                    <option value="{{ $module }}">{{ ucfirst($module) }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="filter-bar__field">
+                <label class="form-label" for="filterUser">User</label>
+                <select class="form-control form-control-sm" id="filterUser">
+                    <option value="">All Users</option>
+                    @foreach($users as $user)
+                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="filter-bar__field">
+                <label class="form-label" for="filterDateFrom">From</label>
+                <input type="date" class="form-control form-control-sm" id="filterDateFrom">
+            </div>
+            <div class="filter-bar__field">
+                <label class="form-label" for="filterDateTo">To</label>
+                <input type="date" class="form-control form-control-sm" id="filterDateTo">
+            </div>
+            <div class="filter-bar__field d-flex align-items-end">
+                <button type="button" id="clearFilters" class="btn btn-modern btn-modern--ghost btn-modern--sm">Clear</button>
             </div>
         </div>
-
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-clipboard-list"></i> Audit Trail</h3>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                <table class="table table-bordered table-striped" id="auditTable" style="min-width:900px">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>User</th>
-                            <th>Action</th>
-                            <th>Module</th>
-                            <th>Description</th>
-                            <th>IP Address</th>
-                            <th>Date & Time</th>
-                            <th>Details</th>
-                        </tr>
-                    </thead>
-                </table>
-                </div>
-            </div>
-        </div>
-
     </div>
-</section>
+</div>
+
+<x-table-panel title="Audit Trail" icon="fas fa-clipboard-list">
+    <div class="table-responsive">
+        <table class="table table-modern table-striped w-100" id="auditTable" style="min-width:900px">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Module</th>
+                    <th>Description</th>
+                    <th>IP Address</th>
+                    <th>Date & Time</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</x-table-panel>
 @endsection
 
 @push('scripts')
 <script>
 $(function() {
-    var table = $('#auditTable').DataTable({
+    var table = initModernDataTable('#auditTable', {
         processing: true,
         serverSide: true,
         ajax: {
@@ -103,7 +95,7 @@ $(function() {
             {
                 data: 'id',
                 render: function(id) {
-                    return '<a href="{{ route("backend.admin.audit-logs.index") }}/' + id + '" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>';
+                    return '<a href="{{ route("backend.admin.audit-logs.index") }}/' + id + '" class="table-actions-btn table-actions-btn--primary" title="View details" aria-label="View details"><i class="fas fa-eye"></i></a>';
                 },
                 orderable: false, searchable: false
             }

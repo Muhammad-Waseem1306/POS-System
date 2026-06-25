@@ -1,113 +1,117 @@
 @extends('backend.master')
 
 @section('title', 'Notification Center')
+@section('page-class', 'page-modern--no-page-title')
 
 @section('content')
-<section class="content">
-    <div class="container-fluid">
+<div class="content-card">
+    @if($unreadCount > 0)
+    <div class="content-card__toolbar">
+        <span class="text-muted small">{{ $unreadCount }} unread notification{{ $unreadCount !== 1 ? 's' : '' }}</span>
+        <form action="{{ route('backend.admin.notifications.mark-all-read') }}" method="POST">
+            @csrf
+            <button class="btn btn-modern btn-modern--secondary btn-modern--sm">
+                <i class="fas fa-check-double"></i> Mark All Read
+            </button>
+        </form>
+    </div>
+    @endif
 
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4><i class="fas fa-bell"></i> Notification Center
-                @if($unreadCount > 0)
-                    <span class="badge bg-danger">{{ $unreadCount }} unread</span>
+    <div class="filter-bar">
+        <form method="GET" class="filter-bar__form form-modern">
+            <div class="filter-bar__grid filter-bar__grid--notifications">
+                <div class="filter-bar__field">
+                    <label class="form-label" for="filterType">Type</label>
+                    <select name="type" id="filterType" class="form-control form-control-sm">
+                        <option value="">All Types</option>
+                        @foreach($types as $type)
+                        <option value="{{ $type }}" {{ request('type') === $type ? 'selected' : '' }}>
+                            {{ ucfirst(str_replace('_',' ',$type)) }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="filter-bar__field">
+                    <label class="form-label" for="filterSeverity">Severity</label>
+                    <select name="severity" id="filterSeverity" class="form-control form-control-sm">
+                        <option value="">All Severities</option>
+                        <option value="info" {{ request('severity') === 'info' ? 'selected' : '' }}>Info</option>
+                        <option value="warning" {{ request('severity') === 'warning' ? 'selected' : '' }}>Warning</option>
+                        <option value="danger" {{ request('severity') === 'danger' ? 'selected' : '' }}>Danger</option>
+                        <option value="success" {{ request('severity') === 'success' ? 'selected' : '' }}>Success</option>
+                    </select>
+                </div>
+                <div class="filter-bar__field">
+                    <label class="form-label" for="filterStatus">Status</label>
+                    <select name="is_read" id="filterStatus" class="form-control form-control-sm">
+                        <option value="">All Statuses</option>
+                        <option value="0" {{ request('is_read') === '0' ? 'selected' : '' }}>Unread Only</option>
+                        <option value="1" {{ request('is_read') === '1' ? 'selected' : '' }}>Read Only</option>
+                    </select>
+                </div>
+                <x-filter-actions :clear-url="route('backend.admin.notifications.index')" />
+            </div>
+        </form>
+    </div>
+
+    <div class="content-card__body p-3">
+        @forelse($notifications as $notification)
+        <div class="notification-item {{ !$notification->is_read ? 'notification-item--unread' : '' }}">
+            <div class="notification-item__icon">
+                <i class="{{ $notification->severity_icon }}"></i>
+            </div>
+            <div class="notification-item__body">
+                <div class="notification-item__title">
+                    {{ $notification->title }}
+                    @if(!$notification->is_read)
+                        <span class="badge bg-warning text-dark ml-1">New</span>
+                    @endif
+                </div>
+                <p class="notification-item__message">{{ $notification->message }}</p>
+                <div class="notification-item__meta">
+                    <i class="fas fa-clock"></i> {{ $notification->created_at->diffForHumans() }}
+                    <span class="badge bg-secondary ml-1">{{ ucfirst(str_replace('_',' ',$notification->type)) }}</span>
+                </div>
+            </div>
+            <div class="notification-item__actions">
+                @if($notification->action_url)
+                <a href="{{ $notification->action_url }}" class="btn btn-modern btn-modern--primary btn-modern--sm btn-modern--icon" title="Open">
+                    <i class="fas fa-external-link-alt"></i>
+                </a>
                 @endif
-            </h4>
-            @if($unreadCount > 0)
-            <form action="{{ route('backend.admin.notifications.mark-all-read') }}" method="POST">
-                @csrf
-                <button class="btn btn-sm btn-secondary">
-                    <i class="fas fa-check-double"></i> Mark All Read
-                </button>
-            </form>
-            @endif
-        </div>
-
-        {{-- Filters --}}
-        <div class="card card-outline card-secondary">
-            <div class="card-body py-2">
-                <form method="GET" class="form-inline">
-                    <div class="form-group mr-2">
-                        <select name="type" class="form-control form-control-sm">
-                            <option value="">All Types</option>
-                            @foreach($types as $type)
-                            <option value="{{ $type }}" {{ request('type') === $type ? 'selected' : '' }}>
-                                {{ ucfirst(str_replace('_',' ',$type)) }}
-                            </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group mr-2">
-                        <select name="severity" class="form-control form-control-sm">
-                            <option value="">All Severities</option>
-                            <option value="info">Info</option>
-                            <option value="warning">Warning</option>
-                            <option value="danger">Danger</option>
-                            <option value="success">Success</option>
-                        </select>
-                    </div>
-                    <div class="form-group mr-2">
-                        <select name="is_read" class="form-control form-control-sm">
-                            <option value="">All</option>
-                            <option value="0">Unread Only</option>
-                            <option value="1">Read Only</option>
-                        </select>
-                    </div>
-                    <button class="btn btn-primary btn-sm">Filter</button>
-                    <a href="{{ route('backend.admin.notifications.index') }}" class="btn btn-secondary btn-sm ml-2">Clear</a>
+                @if(!$notification->is_read)
+                <form action="{{ route('backend.admin.notifications.mark-read', $notification->id) }}" method="POST">
+                    @csrf
+                    <button class="btn btn-modern btn-modern--success btn-modern--sm btn-modern--icon" title="Mark read">
+                        <i class="fas fa-check"></i>
+                    </button>
+                </form>
+                @endif
+                <form action="{{ route('backend.admin.notifications.delete', $notification->id) }}" method="POST"
+                      data-confirm="Delete this notification?"
+                      data-confirm-title="Delete notification"
+                      data-confirm-ok="Delete"
+                      data-confirm-variant="danger">
+                    @csrf @method('DELETE')
+                    <button class="btn btn-modern btn-modern--danger btn-modern--sm btn-modern--icon" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </form>
             </div>
         </div>
-
-        @forelse($notifications as $notification)
-        <div class="card mb-2 {{ !$notification->is_read ? 'card-warning card-outline' : '' }}">
-            <div class="card-body py-2">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div class="d-flex align-items-center">
-                        <i class="{{ $notification->severity_icon }} mr-2 fa-lg"></i>
-                        <div>
-                            <strong>{{ $notification->title }}</strong>
-                            @if(!$notification->is_read)
-                                <span class="badge bg-warning text-dark ml-1">New</span>
-                            @endif
-                            <br>
-                            <small>{{ $notification->message }}</small>
-                            <br>
-                            <small class="text-muted">
-                                <i class="fas fa-clock"></i> {{ $notification->created_at->diffForHumans() }}
-                                &bull; <span class="badge bg-secondary">{{ ucfirst(str_replace('_',' ',$notification->type)) }}</span>
-                            </small>
-                        </div>
-                    </div>
-                    <div class="d-flex">
-                        @if($notification->action_url)
-                        <a href="{{ $notification->action_url }}" class="btn btn-sm btn-info mr-1">
-                            <i class="fas fa-external-link-alt"></i>
-                        </a>
-                        @endif
-                        @if(!$notification->is_read)
-                        <form action="{{ route('backend.admin.notifications.mark-read', $notification->id) }}" method="POST" class="mr-1">
-                            @csrf
-                            <button class="btn btn-sm btn-success"><i class="fas fa-check"></i></button>
-                        </form>
-                        @endif
-                        <form action="{{ route('backend.admin.notifications.delete', $notification->id) }}" method="POST"
-                              onsubmit="return confirm('Delete this notification?')">
-                            @csrf @method('DELETE')
-                            <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
         @empty
-        <div class="text-center py-5">
-            <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
-            <p class="text-muted">No notifications found.</p>
-        </div>
+        <x-empty-state
+            icon="fas fa-bell-slash"
+            title="No notifications found"
+            message="You're all caught up, or try changing the filters above."
+        />
         @endforelse
 
-        {{ $notifications->appends(request()->query())->links() }}
-
+        @if($notifications->hasPages())
+        <div class="datatable-footer">
+            {{ $notifications->appends(request()->query())->links() }}
+        </div>
+        @endif
     </div>
-</section>
+</div>
 @endsection

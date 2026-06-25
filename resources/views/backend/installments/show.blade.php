@@ -3,101 +3,123 @@
 @section('title', 'Installment Details #' . $plan->id)
 
 @section('content')
-<div class="card">
-  <div class="card-body">
-    <div class="d-flex justify-content-between mb-4">
-      <div>
-        <h4>Installment Plan #{{ $plan->id }}</h4>
-        <p><strong>Customer:</strong> {{ $plan->customer->name ?? 'N/A' }}</p>
-        <p><strong>Guarantor:</strong> {{ $plan->guarantor->name ?? 'N/A' }}</p>
-      </div>
-      <button class="btn btn-primary" onclick="window.print()">Print</button>
-    </div>
+@php
+    $sym = currency() ? currency()->symbol : '$';
+    $fmt = fn($n) => $sym . ' ' . number_format((float)$n, 2);
+@endphp
 
-    <div class="row mb-4">
-      <div class="col-md-6">
-        <table class="table table-bordered">
-          <tr><th>Cash Price</th><td>{{ (currency() ? currency()->symbol : '$') . ' ' . number_format((float)$plan->cash_price, 2) }}</td></tr>
-          <tr><th>Installment Price</th><td>{{ (currency() ? currency()->symbol : '$') . ' ' . number_format((float)$plan->installment_price, 2) }}</td></tr>
-          <tr><th>Total Amount</th><td>{{ (currency() ? currency()->symbol : '$') . ' ' . number_format((float)$plan->total_amount, 2) }}</td></tr>
-          <tr><th>Down Payment</th><td>{{ (currency() ? currency()->symbol : '$') . ' ' . number_format((float)$plan->down_payment, 2) }}</td></tr>
-          <tr><th>Financed Amount</th><td>{{ (currency() ? currency()->symbol : '$') . ' ' . number_format((float)$plan->financed_amount, 2) }}</td></tr>
-        </table>
-      </div>
-      <div class="col-md-6">
-        <table class="table table-bordered">
-          <tr><th>Installment Months</th><td>{{ $plan->installment_months }}</td></tr>
-          <tr><th>Monthly Installment</th><td>{{ (currency() ? currency()->symbol : '$') . ' ' . number_format((float)$plan->monthly_installment, 2) }}</td></tr>
-          <tr><th>Start Date</th><td>{{ optional($plan->start_date)->format('d M, Y') }}</td></tr>
-          <tr><th>End Date</th><td>{{ optional($plan->end_date)->format('d M, Y') }}</td></tr>
-          <tr><th>Status</th><td>{{ ucfirst($plan->status) }}</td></tr>
-        </table>
-      </div>
-    </div>
-
-    <div class="row mb-4">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-body">
-            <h5>Schedule</h5>
-            <table class="table table-bordered">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Due Date</th>
-                  <th>Amount</th>
-                  <th>Paid</th>
-                  <th>Remaining</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                @foreach($plan->schedules as $schedule)
-                <tr>
-                  <td>{{ $schedule->installment_number }}</td>
-                  <td>{{ $schedule->due_date->format('d M, Y') }}</td>
-                  <td>{{ (currency() ? currency()->symbol : '$') . ' ' . number_format((float)$schedule->amount, 2) }}</td>
-                  <td>{{ (currency() ? currency()->symbol : '$') . ' ' . number_format((float)$schedule->paid_amount, 2) }}</td>
-                  <td>{{ (currency() ? currency()->symbol : '$') . ' ' . number_format((float)$schedule->remaining_amount, 2) }}</td>
-                  <td>{{ ucfirst($schedule->status) }}</td>
-                </tr>
-                @endforeach
-              </tbody>
-            </table>
-          </div>
+<div class="content-card p-4">
+    <div class="page-header mb-4">
+        <div class="page-header__info">
+            <h2 class="page-header__title">Installment Plan #{{ $plan->id }}</h2>
+            <p class="page-header__subtitle">{{ $plan->customer->name ?? 'N/A' }} · {{ ucfirst($plan->status) }}</p>
         </div>
-      </div>
+        <div class="page-header__actions">
+            <button class="btn btn-modern btn-modern--ghost" onclick="window.print()">
+                <i class="fas fa-print"></i> Print
+            </button>
+        </div>
     </div>
 
-    <div class="row mb-4">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-body">
-            <h5>Payment Allocations</h5>
-            <table class="table table-bordered">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Schedule</th>
-                  <th>Amount</th>
-                  <th>Paid At</th>
-                </tr>
-              </thead>
-              <tbody>
-                @foreach($plan->paymentAllocations as $allocation)
-                <tr>
-                  <td>{{ $loop->iteration }}</td>
-                  <td>{{ $allocation->installmentSchedule->installment_number ?? '-' }}</td>
-                  <td>{{ (currency() ? currency()->symbol : '$') . ' ' . number_format((float)$allocation->amount, 2) }}</td>
-                  <td>{{ optional($allocation->allocated_at)->format('d M, Y H:i') }}</td>
-                </tr>
-                @endforeach
-              </tbody>
-            </table>
-          </div>
+    <div class="detail-grid mb-4">
+        <div class="detail-item">
+            <span class="detail-item__label">Customer</span>
+            <span class="detail-item__value">{{ $plan->customer->name ?? 'N/A' }}</span>
         </div>
-      </div>
+        <div class="detail-item">
+            <span class="detail-item__label">Guarantor</span>
+            <span class="detail-item__value">{{ $plan->guarantor->name ?? 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-item__label">Cash Price</span>
+            <span class="detail-item__value">{{ $fmt($plan->cash_price) }}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-item__label">Installment Price</span>
+            <span class="detail-item__value">{{ $fmt($plan->installment_price) }}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-item__label">Total Amount</span>
+            <span class="detail-item__value">{{ $fmt($plan->total_amount) }}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-item__label">Down Payment</span>
+            <span class="detail-item__value">{{ $fmt($plan->down_payment) }}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-item__label">Financed Amount</span>
+            <span class="detail-item__value">{{ $fmt($plan->financed_amount) }}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-item__label">Installment Months</span>
+            <span class="detail-item__value">{{ $plan->installment_months }}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-item__label">Monthly Installment</span>
+            <span class="detail-item__value">{{ $fmt($plan->monthly_installment) }}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-item__label">Start Date</span>
+            <span class="detail-item__value">{{ optional($plan->start_date)->format('d M, Y') }}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-item__label">End Date</span>
+            <span class="detail-item__value">{{ optional($plan->end_date)->format('d M, Y') }}</span>
+        </div>
     </div>
-  </div>
+
+    <x-table-panel title="Schedule" icon="fas fa-calendar-alt" class="mb-4">
+        <div class="table-responsive">
+            <table class="table table-modern mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Due Date</th>
+                        <th>Amount</th>
+                        <th>Paid</th>
+                        <th>Remaining</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($plan->schedules as $schedule)
+                    <tr>
+                        <td>{{ $schedule->installment_number }}</td>
+                        <td>{{ $schedule->due_date->format('d M, Y') }}</td>
+                        <td>{{ $fmt($schedule->amount) }}</td>
+                        <td>{{ $fmt($schedule->paid_amount) }}</td>
+                        <td>{{ $fmt($schedule->remaining_amount) }}</td>
+                        <td>{{ ucfirst($schedule->status) }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </x-table-panel>
+
+    <x-table-panel title="Payment Allocations" icon="fas fa-exchange-alt">
+        <div class="table-responsive">
+            <table class="table table-modern mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Schedule</th>
+                        <th>Amount</th>
+                        <th>Paid At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($plan->paymentAllocations as $allocation)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $allocation->installmentSchedule->installment_number ?? '-' }}</td>
+                        <td>{{ $fmt($allocation->amount) }}</td>
+                        <td>{{ optional($allocation->allocated_at)->format('d M, Y H:i') }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </x-table-panel>
 </div>
 @endsection
