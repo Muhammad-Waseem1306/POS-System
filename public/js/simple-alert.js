@@ -1,42 +1,41 @@
-var alerts = document.querySelectorAll(".alert:not(.not_hide)");
+(function () {
+    function dismissToast(toast) {
+        if (!toast || toast.classList.contains('app-toast--dismiss')) {
+            return;
+        }
 
-setTimeout(function () {
-    for (var i = 0; i < alerts.length; i++) {
-        var alert = alerts[i];
-        alert.style.transition = "height 0.5s, padding 0.5s, margin 0.5s";
-        alert.style.overflow = "hidden";
-        alert.style.maxHeight = alert.offsetHeight + "px";
-        alert.style.padding = "0";
-        alert.style.margin = "0";
+        toast.classList.add('app-toast--dismiss');
 
-        setTimeout(
-            function (alert) {
-                alert.style.maxHeight = alert.offsetHeight + "px";
-                alert.style.padding = "0";
-                alert.style.margin = "0";
-            },
-            10,
-            alert
-        );
+        window.setTimeout(function () {
+            var container = toast.closest('.app-toast-container');
+            toast.remove();
 
-        setTimeout(
-            function (alert) {
-                alert.style.maxHeight = "0";
-                alert.style.paddingTop = "0";
-                alert.style.paddingBottom = "0";
-                alert.style.marginTop = "0";
-                alert.style.marginBottom = "0";
-            },
-            20,
-            alert
-        );
-
-        setTimeout(
-            function (alert) {
-                alert.style.display = "none";
-            },
-            500,
-            alert
-        );
+            if (container && !container.querySelector('.app-toast')) {
+                container.remove();
+            }
+        }, 250);
     }
-}, 2000);
+
+    function initToasts() {
+        document.querySelectorAll('.app-toast:not([data-toast-init])').forEach(function (toast) {
+            toast.setAttribute('data-toast-init', 'true');
+
+            var closeButton = toast.querySelector('.app-toast__close');
+            if (closeButton) {
+                closeButton.addEventListener('click', function () {
+                    dismissToast(toast);
+                });
+            }
+
+            window.setTimeout(function () {
+                dismissToast(toast);
+            }, 4500);
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initToasts);
+    } else {
+        initToasts();
+    }
+})();
