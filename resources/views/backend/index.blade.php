@@ -1,239 +1,235 @@
 @extends('backend.master')
 
 @section('title', 'Dashboard')
+@section('page-class', 'page-modern--no-page-title')
 
 @section('content')
-<section class="content">
     @can('dashboard_view')
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12 col-sm-6 col-md-3">
-                <div class="info-box">
-                    <span class="info-box-icon bg-info elevation-1"><i class="fas fa-cog"></i></span>
-
-                    <div class="info-box-content">
-                        <span class="info-box-text">Sale SubTotal</span>
-                        <span class="info-box-number">
-                            {{currency()->symbol??''}} {{number_format((float)$sub_total,2,'.',',')}}  
-                            <small></small>
-                        </span>
-                    </div>
-                    <!-- /.info-box-content -->
-                </div>
-                <!-- /.info-box -->
-            </div>
-            <!-- /.col -->
-            <div class="col-12 col-sm-6 col-md-3">
-                <div class="info-box mb-3">
-                    <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-thumbs-up"></i></span>
-
-                    <div class="info-box-content">
-                        <span class="info-box-text">Sale Discount</span>
-                        <span class="info-box-number">{{currency()->symbol??''}} {{number_format((float)$discount,2,'.',',')}}</span>
-                    </div>
-                    <!-- /.info-box-content -->
-                </div>
-                <!-- /.info-box -->
-            </div>
-            <!-- /.col -->
-
-            <!-- fix for small devices only -->
-            <div class="clearfix hidden-md-up"></div>
-
-            <div class="col-12 col-sm-6 col-md-3">
-                <div class="info-box mb-3">
-                    <span class="info-box-icon bg-success elevation-1"><i class="fas fa-shopping-cart"></i></span>
-
-                    <div class="info-box-content">
-                        <span class="info-box-text">Sale</span>
-                        <span class="info-box-number">{{currency()->symbol??''}} {{number_format((float)$total,2,'.',',')}}</span>
-                    </div>
-                    <!-- /.info-box-content -->
-                </div>
-                <!-- /.info-box -->
-            </div>
-            <!-- /.col -->
-            <div class="col-12 col-sm-6 col-md-3">
-                <div class="info-box mb-3">
-                    <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-users"></i></span>
-
-                    <div class="info-box-content">
-                        <span class="info-box-text">Sale Due </span>
-                        <span class="info-box-number">{{currency()->symbol??''}} {{number_format((float)$due,2,'.',',')}}</span>
-                    </div>
-                    <!-- /.info-box-content -->
-                </div>
-                <!-- /.info-box -->
-            </div>
-            <!-- /.col -->
-        </div>
-
-        <!-- Small boxes (Stat box) -->
-        <div class="row">
-            <div class="col-lg-3 col-6">
-                <!-- small box -->
-                <div class="small-box bg-info">
-                    <div class="inner">
-                        <h3>{{$total_customer}}</h3>
-                        <p>Customers</p>
-                    </div>
-                    <div class="icon">
-                        <i class="ion ion-bag"></i>
-                    </div>
-                    <a href="{{route('backend.admin.customers.index')}}" class="small-box-footer">
-                        More info
-                        <i class="fas fa-arrow-circle-right"></i>
-                    </a>
-                </div>
-            </div>
-            <!-- ./col -->
-            <div class="col-lg-3 col-6">
-                <!-- small box -->
-                <div class="small-box bg-success">
-                    <div class="inner">
-                        <h3>{{$total_product}}</h3>
-                        <p>Products</p>
-                    </div>
-                    <div class="icon">
-                        <i class="ion ion-stats-bars"></i>
-                    </div>
-                    <a href="{{route('backend.admin.products.index')}}" class="small-box-footer">
-                        More info
-                        <i class="fas fa-arrow-circle-right"></i>
-                    </a>
-                </div>
-            </div>
-            <!-- ./col -->
-            <div class="col-lg-3 col-6">
-                <!-- small box -->
-                <div class="small-box bg-warning">
-                    <div class="inner">
-                        <h3>{{$total_order}}</h3>
-                        <p>Sale</p>
-                    </div>
-                    <div class="icon">
-                        <i class="ion ion-person-add"></i>
-                    </div>
-                    <a href="{{route('backend.admin.orders.index')}}" class="small-box-footer">
-                        More info
-                        <i class="fas fa-arrow-circle-right"></i>
-                    </a>
-                </div>
-            </div>
-            <!-- ./col -->
-            <div class="col-lg-3 col-6">
-                <!-- small box -->
-                <div class="small-box bg-danger">
-                    <div class="inner">
-                        <h3>{{$total_sale_item}}</h3>
-                        <p>Sale Item</p>
-                    </div>
-                    <div class="icon">
-                        <i class="ion ion-pie-graph"></i>
-                    </div>
-                    <a href="{{route('backend.admin.orders.index')}}" class="small-box-footer">
-                        More info
-                        <i class="fas fa-arrow-circle-right"></i>
-                    </a>
-                </div>
-            </div>
-            <!-- ./col -->
-        </div>
-        <!-- /.row -->
-
-
-        <div class="row">
-            <div class="col-6">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Daily Total Sales <small>{{ $dateRange }}</small></h5>
-                        <div class="input-group w-auto">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">
-                                    <i class="far fa-calendar-alt"></i>
-                                </span>
-                            </div>
-                            <input type="text" class="form-control" id="reservation" style="width: 180px;">
+        <div class="dashboard-modern">
+            {{-- Currency KPIs --}}
+            <div class="row dashboard-row">
+                <div class="col-12 col-sm-6 col-xl-3 mb-3 mb-xl-0">
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-card__icon dashboard-stat-card__icon--blue">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <div class="dashboard-stat-card__body">
+                            <span class="dashboard-stat-card__label">Sale Subtotal</span>
+                            <span class="dashboard-stat-card__value">{{ currency()->symbol ?? '' }}
+                                {{ number_format((float) $sub_total, 2, '.', ',') }}</span>
                         </div>
                     </div>
-
-                    <div class="card-body">
-                        <canvas id="dailySaleLineChart"></canvas>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3 mb-3 mb-xl-0">
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-card__icon dashboard-stat-card__icon--violet">
+                            <i class="fas fa-percent"></i>
+                        </div>
+                        <div class="dashboard-stat-card__body">
+                            <span class="dashboard-stat-card__label">Sale Discount</span>
+                            <span class="dashboard-stat-card__value">{{ currency()->symbol ?? '' }}
+                                {{ number_format((float) $discount, 2, '.', ',') }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3 mb-3 mb-xl-0">
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-card__icon dashboard-stat-card__icon--emerald">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="dashboard-stat-card__body">
+                            <span class="dashboard-stat-card__label">Total Sales</span>
+                            <span class="dashboard-stat-card__value">{{ currency()->symbol ?? '' }}
+                                {{ number_format((float) $total, 2, '.', ',') }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3 mb-3 mb-xl-0">
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-card__icon dashboard-stat-card__icon--amber">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="dashboard-stat-card__body">
+                            <span class="dashboard-stat-card__label">Sale Due</span>
+                            <span class="dashboard-stat-card__value">{{ currency()->symbol ?? '' }}
+                                {{ number_format((float) $due, 2, '.', ',') }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Monthly Total Sales <small>for {{ $currentYear }}</small></h5>
+
+            {{-- Count metrics --}}
+            <div class="row dashboard-row">
+                <div class="col-12 col-sm-6 col-xl-3 mb-3 mb-xl-0">
+                    <a href="{{ route('backend.admin.customers.index') }}" class="dashboard-metric-card">
+                        <div class="dashboard-metric-card__top">
+                            <span class="dashboard-metric-card__value">{{ $total_customer }}</span>
+                            <span class="dashboard-metric-card__icon dashboard-metric-card__icon--blue">
+                                <i class="fas fa-users"></i>
+                            </span>
+                        </div>
+                        <span class="dashboard-metric-card__label">Customers</span>
+                        <span class="dashboard-metric-card__link">View all <i class="fas fa-arrow-right"></i></span>
+                    </a>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3 mb-3 mb-xl-0">
+                    <a href="{{ route('backend.admin.products.index') }}" class="dashboard-metric-card">
+                        <div class="dashboard-metric-card__top">
+                            <span class="dashboard-metric-card__value">{{ $total_product }}</span>
+                            <span class="dashboard-metric-card__icon dashboard-metric-card__icon--green">
+                                <i class="fas fa-box"></i>
+                            </span>
+                        </div>
+                        <span class="dashboard-metric-card__label">Products</span>
+                        <span class="dashboard-metric-card__link">View all <i class="fas fa-arrow-right"></i></span>
+                    </a>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3 mb-3 mb-xl-0">
+                    <a href="{{ route('backend.admin.orders.index') }}" class="dashboard-metric-card">
+                        <div class="dashboard-metric-card__top">
+                            <span class="dashboard-metric-card__value">{{ $total_order }}</span>
+                            <span class="dashboard-metric-card__icon dashboard-metric-card__icon--amber">
+                                <i class="fas fa-tags"></i>
+                            </span>
+                        </div>
+                        <span class="dashboard-metric-card__label">Sales</span>
+                        <span class="dashboard-metric-card__link">View all <i class="fas fa-arrow-right"></i></span>
+                    </a>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3 mb-3 mb-xl-0">
+                    <a href="{{ route('backend.admin.orders.index') }}" class="dashboard-metric-card">
+                        <div class="dashboard-metric-card__top">
+                            <span class="dashboard-metric-card__value">{{ $total_sale_item }}</span>
+                            <span class="dashboard-metric-card__icon dashboard-metric-card__icon--rose">
+                                <i class="fas fa-layer-group"></i>
+                            </span>
+                        </div>
+                        <span class="dashboard-metric-card__label">Sale Items</span>
+                        <span class="dashboard-metric-card__link">View all <i class="fas fa-arrow-right"></i></span>
+                    </a>
+                </div>
+            </div>
+
+            {{-- Charts --}}
+            <div class="row dashboard-row">
+                <div class="col-12 col-xl-6 mb-3 mb-xl-0">
+                    <div class="dashboard-chart-card">
+                        <div class="dashboard-chart-card__header">
+                            <div>
+                                <h5 class="dashboard-chart-card__title">Daily Total Sales</h5>
+                                <span class="dashboard-chart-card__subtitle">{{ $dateRange }}</span>
+                            </div>
+                            <div class="dashboard-chart-card__picker input-group w-auto">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="far fa-calendar-alt"></i>
+                                    </span>
+                                </div>
+                                <input type="text" class="form-control" id="reservation">
+                            </div>
+                        </div>
+                        <div class="dashboard-chart-card__body">
+                            <canvas id="dailySaleLineChart"></canvas>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <canvas id="barChartYear"></canvas>
+                </div>
+                <div class="col-12 col-xl-6">
+                    <div class="dashboard-chart-card">
+                        <div class="dashboard-chart-card__header">
+                            <div>
+                                <h5 class="dashboard-chart-card__title">Monthly Total Sales</h5>
+                                <span class="dashboard-chart-card__subtitle">For {{ $currentYear }}</span>
+                            </div>
+                        </div>
+                        <div class="dashboard-chart-card__body">
+                            <canvas id="barChartYear"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     @endcan
-    <!-- /.container-fluid -->
-</section>
 @endsection
+
 @push('script')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const dailySaleChart = document.getElementById('dailySaleLineChart');
-    const barChartYear = document.getElementById('barChartYear');
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const chartFont = "'Plus Jakarta Sans', 'Source Sans Pro', sans-serif";
+        const chartGrid = '#e2e8f0';
+        const chartText = '#64748b';
+        const chartBlue = '#2563eb';
+        const chartBlueSoft = 'rgba(37, 99, 235, 0.12)';
 
-    new Chart(dailySaleChart, {
-        type: 'line',
-        data: {
-            labels: @json($dates),
-            datasets: [{
-                label: 'Sales',
-                data: @json($totalAmounts),
-                borderWidth: 1
-            }]
-        },
-        options: {
+        const baseChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        font: { family: chartFont, size: 12 },
+                        color: chartText,
+                        boxWidth: 12,
+                        usePointStyle: true
+                    }
+                }
+            },
             scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { family: chartFont }, color: chartText }
+                },
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    grid: { color: chartGrid },
+                    ticks: { font: { family: chartFont }, color: chartText }
                 }
             }
-        }
-    });
+        };
 
-    new Chart(barChartYear, {
-        type: 'bar',
-        data: {
-            labels: @json($months),
-            datasets: [{
-                label: 'Sales',
-                data: @json($totalAmountMonth),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-</script>
-<script>
-    $(function() {
-        //Date range picker
-        $('#reservation').daterangepicker().on('apply.daterangepicker', function(e, picker) {
-            let selectedDateRange = picker.startDate.format('YYYY-MM-DD') + ' to ' + picker.endDate.format('YYYY-MM-DD');
-
-            // Update URL with daterange query parameter
-            let url = new URL(window.location.href);
-            url.searchParams.set('daterange', selectedDateRange);
-            window.location.href = url.toString();
+        new Chart(document.getElementById('dailySaleLineChart'), {
+            type: 'line',
+            data: {
+                labels: @json($dates),
+                datasets: [{
+                    label: 'Sales',
+                    data: @json($totalAmounts),
+                    borderColor: chartBlue,
+                    backgroundColor: chartBlueSoft,
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                    pointBackgroundColor: chartBlue
+                }]
+            },
+            options: baseChartOptions
         });
 
-    })
-</script>
+        new Chart(document.getElementById('barChartYear'), {
+            type: 'bar',
+            data: {
+                labels: @json($months),
+                datasets: [{
+                    label: 'Sales',
+                    data: @json($totalAmountMonth),
+                    backgroundColor: chartBlue,
+                    borderRadius: 6,
+                    borderSkipped: false
+                }]
+            },
+            options: baseChartOptions
+        });
+    </script>
+    <script>
+        $(function() {
+            $('#reservation').daterangepicker().on('apply.daterangepicker', function(e, picker) {
+                const selectedDateRange = picker.startDate.format('YYYY-MM-DD') + ' to ' + picker.endDate
+                    .format('YYYY-MM-DD');
+                const url = new URL(window.location.href);
+                url.searchParams.set('daterange', selectedDateRange);
+                window.location.href = url.toString();
+            });
+        });
+    </script>
 @endpush
