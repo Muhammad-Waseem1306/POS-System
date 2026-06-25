@@ -3,187 +3,104 @@
 @section('title', 'Update Product')
 
 @section('content')
-<div class="card">
-  <div class="card-body">
-    <form action="{{ route('backend.admin.products.update',$product->id) }}" method="post" class="accountForm"
-      enctype="multipart/form-data">
-      @csrf
-      @method('PUT')
-      <div class="card-body">
-        <div class="row">
-          <div class="mb-3 col-md-6">
-            <label for="title" class="form-label">
-              Name
-              <span class="text-danger">*</span>
-            </label>
-            <input type="text" class="form-control" placeholder="Enter title" name="name"
-              value="{{ old('name', $product->name) }}" required>
-          </div>
-          <div class="mb-3 col-md-6">
-            <label for="sku" class="form-label">
-              Sku
-              <span class="text-danger">*</span>
-            </label>
-            <input type="text" class="form-control" placeholder="Enter sku" name="sku"
-              value="{{ old('sku',$product->sku)}}" required>
-          </div>
-          <div class="mb-3 col-md-6">
-            <label for="brand_id" class="form-label">
-              Brand
-              <span class="text-danger">*</span>
-            </label>
-            <select class="form-control select2" style="width: 100%;" name="brand_id" required>
-              <option value="">Select Brand</option>
-              @foreach ($brands as $item)
-              <option value={{ $item->id }}
-                {{ $product->brand_id == $item->id ? 'selected' : '' }}>
-                {{ $item->name }}
-              </option>
-              @endforeach
+<x-form-page
+    :action="route('backend.admin.products.update', $product->id)"
+    method="PUT"
+    :cancel-url="route('backend.admin.products.index')"
+    submit-label="Update Product"
+    enctype="multipart/form-data"
+>
+    <x-form-section title="Basic Information">
+        <x-form-field label="Name" name="name" required>
+            <input type="text" class="form-control" id="name" placeholder="Enter product name" name="name"
+                value="{{ old('name', $product->name) }}" required>
+        </x-form-field>
+        <x-form-field label="SKU" name="sku" required>
+            <input type="text" class="form-control" id="sku" placeholder="Enter SKU" name="sku"
+                value="{{ old('sku', $product->sku) }}" required>
+        </x-form-field>
+        <x-form-field label="Brand" name="brand_id" required>
+            <select class="form-control select2" name="brand_id" id="brand_id" required>
+                <option value="">Select brand</option>
+                @foreach ($brands as $item)
+                <option value="{{ $item->id }}" {{ old('brand_id', $product->brand_id) == $item->id ? 'selected' : '' }}>
+                    {{ $item->name }}
+                </option>
+                @endforeach
             </select>
-          </div>
-          <div class="mb-3 col-md-6">
-            <label for="category_id" class="form-label">
-              Category
-              <span class="text-danger">*</span>
-            </label>
-            <select class="form-control select2" style="width: 100%;" name="category_id" required>
-              <option value="">Select Category</option>
-              @foreach ($categories as $item)
-              <option value={{ $item->id }}
-                {{ $product->category_id == $item->id ? 'selected' : '' }}>
-                {{ $item->name }}
-              </option>
-              @endforeach
+        </x-form-field>
+        <x-form-field label="Category" name="category_id" required>
+            <select class="form-control select2" name="category_id" id="category_id" required>
+                <option value="">Select category</option>
+                @foreach ($categories as $item)
+                <option value="{{ $item->id }}" {{ old('category_id', $product->category_id) == $item->id ? 'selected' : '' }}>
+                    {{ $item->name }}
+                </option>
+                @endforeach
             </select>
-          </div>
-          <div class="mb-3 col-md-6">
-            <label for="price" class="form-label">
-              Price
-              <span class="text-danger">*</span>
-            </label>
-            <input type="number" step="0.01" min="0" class="form-control"
-              placeholder="Enter price" name="price" value="{{ old('price',$product->price) }}" required>
-          </div>
-          <div class="mb-3 col-md-6">
-            <label for="unit_id" class="form-label">
-              Unit
-              <span class="text-danger">*</span>
-            </label>
-            <select class="form-control" style="width: 100%;" name="unit_id" required>
-              <option value="">Select Unit</option>
-              @foreach ($units as $item)
-              <option value={{ $item->id }}
-                {{ $product->unit_id == $item->id ? 'selected' : '' }}>
-                {{ $item->title . ' (' . $item->short_name . ')' }}
-              </option>
-              @endforeach
+        </x-form-field>
+        <x-form-field label="Unit" name="unit_id" required>
+            <select class="form-control" name="unit_id" id="unit_id" required>
+                <option value="">Select unit</option>
+                @foreach ($units as $item)
+                <option value="{{ $item->id }}" {{ old('unit_id', $product->unit_id) == $item->id ? 'selected' : '' }}>
+                    {{ $item->title . ' (' . $item->short_name . ')' }}
+                </option>
+                @endforeach
             </select>
-          </div>
-          <div class="mb-3 col-md-6">
-            <label for="model" class="form-label">
-              Model
-            </label>
-            <input type="text" class="form-control" placeholder="Enter model" name="model"
-              value="{{ old('model', $product->model) }}">
-          </div>
-          <div class="mb-3 col-md-6">
-            <label for="warranty_period_months" class="form-label">
-              Warranty Period (months)
-            </label>
-            <input type="number" min="0" class="form-control" placeholder="Enter warranty period" name="warranty_period_months"
-              value="{{ old('warranty_period_months', $product->warranty_period_months) }}">
-          </div>
-          <!-- <div class="mb-3 col-md-6">
-          <label for="quantity" class="form-label">
-            Initial Stock
-            <span class="text-danger">*</span>
-          </label>
-          <input type="number" class="form-control" placeholder="Enter quantity" name="quantity"
-            value="{{ old('quantity',$product->quantity) }}" required>
-        </div> -->
-          <div class="mb-3 col-md-6">
-            <label for="discount_type" class="form-label">
-              Discount Type
-            </label>
-            <select class="form-control form-select" name="discount_type">
-              <option value="">Select Discount Type</option>
-              <option value="fixed" {{ $product->discount_type == 'fixed' ? 'selected' : '' }}>
-                Fixed
-              </option>
-              <option value="percentage"
-                {{ $product->discount_type  == 'percentage' ? 'selected' : '' }}>
-                Percentage
-              </option>
-            </select>
-          </div>
-          <div class="mb-3 col-md-6">
-            <label for="discount_value" class="form-label">
-              Discount Amount
-            </label>
-            <input type="number" step="0.01" min="0" class="form-control"
-              placeholder="Enter discount" name="discount" value="{{ old('discount',$product->discount) }}">
-          </div>
-          <div class="mb-3 col-md-6">
-            <label for="purchase_price" class="form-label">
-              Purchase Price
-              <span class="text-danger">*</span>
-            </label>
-            <input type="number" step="0.01" min="0" class="form-control"
-              placeholder="Enter purchase Price" name="purchase_price" value="{{ old('purchase_price',$product->purchase_price) }}" required>
-          </div>
-          <div class="mb-3 col-md-6">
-            <label for="thumbnailInput" class="form-label">
-              Image
-            </label>
-            <div class="image-upload-container" id="imageUploadContainer">
-              <input type="file" class="form-control" name="product_image" id="thumbnailInput" accept="image/*" style="display: none;">
-              <div class="thumb-preview" id="thumbPreviewContainer">
-                <img src="{{ asset('storage/' . $product->image) }}" alt="Thumbnail Preview"
-                  class="img-thumbnail" id="thumbnailPreview" onerror="this.onerror=null; this.src='{{ asset('assets/images/no-image.png') }}'">
-                <div class="upload-text d-none">
-                  <i class="fas fa-plus-circle"></i>
-                  <span>Upload Image</span>
-                </div>
-              </div>
-            </div>
-          </div>
+        </x-form-field>
+        <x-form-field label="Model" name="model">
+            <input type="text" class="form-control" id="model" placeholder="Enter model" name="model"
+                value="{{ old('model', $product->model) }}">
+        </x-form-field>
+    </x-form-section>
 
-          <div class="mb-3 col-md-12">
-            <label for="description" class="form-label">
-              Description
-            </label>
-            <textarea class="form-control" placeholder="Enter description" name="description">{{ old('description',$product->description) }}</textarea>
-          </div>
+    <x-form-section title="Pricing & Inventory">
+        <x-form-field label="Price" name="price" required>
+            <input type="number" step="0.01" min="0" class="form-control" id="price"
+                placeholder="Enter selling price" name="price" value="{{ old('price', $product->price) }}" required>
+        </x-form-field>
+        <x-form-field label="Purchase Price" name="purchase_price" required>
+            <input type="number" step="0.01" min="0" class="form-control" id="purchase_price"
+                placeholder="Enter purchase price" name="purchase_price" value="{{ old('purchase_price', $product->purchase_price) }}" required>
+        </x-form-field>
+        <x-form-field label="Discount Type" name="discount_type">
+            <select class="form-control" name="discount_type" id="discount_type">
+                <option value="">Select discount type</option>
+                <option value="fixed" {{ old('discount_type', $product->discount_type) == 'fixed' ? 'selected' : '' }}>Fixed</option>
+                <option value="percentage" {{ old('discount_type', $product->discount_type) == 'percentage' ? 'selected' : '' }}>Percentage</option>
+            </select>
+        </x-form-field>
+        <x-form-field label="Discount Amount" name="discount">
+            <input type="number" step="0.01" min="0" class="form-control" id="discount"
+                placeholder="Enter discount" name="discount" value="{{ old('discount', $product->discount) }}">
+        </x-form-field>
+        <x-form-field label="Warranty Period (months)" name="warranty_period_months">
+            <input type="number" min="0" class="form-control" id="warranty_period_months"
+                placeholder="Enter warranty period" name="warranty_period_months" value="{{ old('warranty_period_months', $product->warranty_period_months) }}">
+        </x-form-field>
+        <x-form-field label="Expire Date" name="expire_date">
+            <input type="date" class="form-control" name="expire_date" id="expire_date"
+                value="{{ old('expire_date', $product->expire_date ? \Carbon\Carbon::parse($product->expire_date)->format('Y-m-d') : '') }}">
+        </x-form-field>
+    </x-form-section>
 
-          <div class="mb-3 col-md-6">
-            <label for="expire_date" class="form-label">
-              Expire date
-            </label>
-
-            <input type="date" class="form-control" name="expire_date" id="expire_date" value="{{ old('expire_date', $product->expire_date ? \Carbon\Carbon::parse($product->expire_date)->format('Y-m-d') : '') }}" />
-          </div>
-          <div class="mb-3 col-md-12">
-            <div class="form-switch px-4">
-              <input type="hidden" name="status" value="0">
-              <input class="form-check-input" type="checkbox" name="status" id="active"
-                value="1" @if($product->status==1) checked @endif>
-              <label class="form-check-label" for="active">
-                Active
-              </label>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6">
-            <button type="submit" class="btn bg-gradient-primary">Update</button>
-          </div>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
+    <x-form-section title="Media & Description">
+        <x-form-field label="Product Image" name="thumbnailInput">
+            <x-form-image-upload
+                name="product_image"
+                placeholder="Upload product image"
+                :preview-src="asset('storage/' . $product->image)"
+            />
+        </x-form-field>
+        <x-form-field label="Description" name="description" col="md-12">
+            <textarea class="form-control" id="description" placeholder="Enter description" name="description" rows="4">{{ old('description', $product->description) }}</textarea>
+        </x-form-field>
+        <x-form-switch :checked="$product->status == 1" />
+    </x-form-section>
+</x-form-page>
 @endsection
+
 @push('script')
 <script src="{{ asset('js/image-field.js') }}"></script>
 @endpush

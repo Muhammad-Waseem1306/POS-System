@@ -3,48 +3,24 @@
 @section('title', 'Import Product')
 
 @section('content')
-<div class="card">
-  <div class="card-body">
-    <form action="{{ route('backend.admin.products.import') }}" method="post" class="accountForm"
-      enctype="multipart/form-data">
-      @csrf
-      <div class="card-body">
-        <div class="row">
-          <div class="mb-3 col-md-6">
-            <div class="form-group">
-              <label for="exampleInputFile">File input</label>
-              <div class="input-group">
-                <div class="custom-file">
-                  <input type="file" class="custom-file-input" name="file" id="exampleInputFile" required>
-                  <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+<x-form-page
+    :action="route('backend.admin.products.import')"
+    :cancel-url="route('backend.admin.products.index')"
+    submit-label="Import Products"
+    enctype="multipart/form-data"
+>
+    <x-form-section title="Import File" description="Upload a CSV or Excel file to bulk import products.">
+        <x-form-field label="Product File" required col="md-8">
+            <div class="d-flex flex-wrap gap-2 align-items-stretch">
+                <div class="flex-grow-1">
+                    <x-form-file name="file" required />
                 </div>
-                <div class="input-group-append">
-                  <a class="input-group-text" href="{{ route('backend.admin.products.import',['download-demo' => true]) }}"><i class="fas fa-download"></i> Demo</a>
-                </div>
-              </div>
+                <a href="{{ route('backend.admin.products.import', ['download-demo' => true]) }}"
+                   class="btn btn-modern btn-modern--ghost align-self-center">
+                    <i class="fas fa-download"></i> Download Demo
+                </a>
             </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="mb-3 col-md-6">
-            <button type="submit" class="btn btn-block bg-gradient-primary">Save</button>
-            <!-- /.card-body -->
-          </div>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
+        </x-form-field>
+    </x-form-section>
+</x-form-page>
 @endsection
-
-@push('style')
-<style>
-  .select2-container--default .select2-selection--single {
-    height: calc(1.5em + 0.75rem + 2px) !important;
-  }
-</style>
-
-@endpush
-@push('script')
-<script src="{{ asset('js/image-field.js') }}"></script>
-@endpush
