@@ -1,7 +1,14 @@
-<footer class="main-footer">
-    <strong>© {{date('Y')}} <a href="#">{{ readConfig('app_name') }}</a></strong>
-    &mdash; {{ readConfig('site_name') }} &mdash; All rights reserved.
-    <div class="float-right d-none d-sm-inline-block">
-        <small class="text-muted">Powered by <strong>Alkyne Solutions</strong></small>
+<footer class="main-footer footer-modern">
+    <div class="footer-modern__inner">
+        <span class="footer-modern__copy">
+            © {{ date('Y') }}
+            <strong>{{ readConfig('site_name') }}</strong>
+            <span class="footer-modern__sep">·</span>
+            All rights reserved
+        </span>
+        <span class="footer-modern__brand">
+            <span class="footer-modern__brand-icon" aria-hidden="true">CC</span>
+            Powered by <strong>{{ readConfig('studio_name') }}</strong>
+        </span>
     </div>
 </footer>

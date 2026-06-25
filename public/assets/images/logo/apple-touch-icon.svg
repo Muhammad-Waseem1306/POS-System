@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none" role="img" aria-label="QPOS">
+  <defs>
+    <linearGradient id="bg" x1="24" y1="16" x2="156" y2="164" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#1d4ed8"/>
+    </linearGradient>
+  </defs>
+  <rect width="180" height="180" rx="40" fill="url(#bg)"/>
+  <path d="M50 78h80v52a8 8 0 0 1-8 8H58a8 8 0 0 1-8-8V78Z" stroke="#fff" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M42 78h96" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+  <path d="M68 78V58a22 22 0 0 1 44 0v20" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

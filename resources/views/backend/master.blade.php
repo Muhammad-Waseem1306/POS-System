@@ -9,13 +9,7 @@
     </title>
 
     <!-- FAVICON ICON -->
-    <link rel="shortcut icon" href="{{ assetImage(readconfig('favicon_icon')) }}" type="image/svg+xml">
-
-    <!-- FAVICON ICON APPLE -->
-    <link href="{{ assetImage(readconfig('favicon_icon_apple')) }}" rel="apple-touch-icon">
-    <link href="{{ assetImage(readconfig('favicon_icon_apple')) }}" rel="apple-touch-icon" sizes="72x72">
-    <link href="{{ assetImage(readconfig('favicon_icon_apple')) }}" rel="apple-touch-icon" sizes="114x114">
-    <link href="{{ assetImage(readconfig('favicon_icon_apple')) }}" rel="apple-touch-icon" sizes="144x144">
+    <x-favicon />
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet"
@@ -49,69 +43,18 @@
     <link rel="stylesheet" href="{{ asset('assets/css/datatable/buttons.dataTables.min.css') }}">
     {{-- custom style --}}
     <link rel="stylesheet" href="{{ asset('css/custom-style.css') }}">
-
-    <style>
-        .image-upload-container {
-            border: 2px dashed #8b9ee9;
-            /* Dashed border color */
-            border-radius: 8px;
-            background-color: #f8f9fa;
-            /* Light background color */
-            display: flex;
-            justify-content: center;
-            /* Center the content */
-            align-items: center;
-            /* Center the content vertically */
-            width: 100%;
-            /* Make the container full width of its parent */
-            height: 200px;
-            /* Fixed height */
-            cursor: pointer;
-            /* Indicate clickability */
-        }
-
-        .thumb-preview {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            /* Prevents overflow */
-        }
-
-        #thumbnailPreview {
-            max-width: 100%;
-            max-height: 100%;
-            /* Ensure it fits within the container */
-            object-fit: cover;
-            /* Maintain aspect ratio while covering the box */
-        }
-
-        .upload-text {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #8b9ee9;
-            /* Text color */
-            text-align: center;
-        }
-
-        .upload-text i {
-            font-size: 24px;
-            /* Icon size */
-            margin-bottom: 5px;
-            /* Space between icon and text */
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/pages-modern.css') }}?v=44">
+    <link rel="stylesheet" href="{{ asset('css/dashboard-modern.css') }}?v=1">
+    <link rel="stylesheet" href="{{ asset('css/sidebar-modern.css') }}?v=12">
+    <link rel="stylesheet" href="{{ asset('css/header-modern.css') }}?v=7">
+    <link rel="stylesheet" href="{{ asset('css/footer-modern.css') }}?v=1">
     @stack('style')
-    @viteReactRefresh
-    @vite('resources/js/app.jsx')
 </head>
 
-<body class="hold-transition sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed sidebar-modern-layout">
 
     <x-simple-alert />
+    <x-confirm-dialog />
 
     <div class="wrapper">
 
@@ -126,13 +69,13 @@
         <!-- /.navbar -->
 
         <!-- Main Sidebar Container -->
-        <aside class="main-sidebar elevation-4 sidebar-light-lightblue">
-            <!-- Brand Logo -->
-            <a href="{{ route('frontend.home') }}" class="brand-link">
-                <img src="{{ assetImage(readconfig('site_logo')) }}" alt="Logo"
-                    class="brand-image img-circle elevation-3" style="opacity: .8">
-                <span class="brand-text font-weight-light">{{ readConfig('site_name') }}</span>
-            </a>
+        <aside class="main-sidebar sidebar-modern elevation-0">
+            <div class="brand-link sidebar-brand">
+                <div class="sidebar-brand__icon" aria-hidden="true">
+                    <i class="fas fa-store"></i>
+                </div>
+                <span class="sidebar-brand__text">{{ readConfig('site_name') }}</span>
+            </div>
 
             <!-- Sidebar -->
             @include('backend.layouts.sidebar')
@@ -141,37 +84,41 @@
         </aside>
 
         <!-- Content Wrapper. Contains page content -->
-        <div class="content-wrapper">
-            <!-- Content Header (Page header) -->
-            <div class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h1 class="m-0">
-                                @yield('title')
-                            </h1>
-                        </div><!-- /.col -->
-                    </div><!-- /.row -->
-                </div><!-- /.container-fluid -->
-            </div>
-            <!-- /.content-header -->
-
-
-            <!-- Main content -->
-            <section class="content">
-                <!-- container-fluid -->
-                <div class="container-fluid">
-
-                    <!-- content -->
-                    @yield('content')
-                    <!-- /.content -->
-
+        <div id="app-page-root">
+            <div class="content-wrapper">
+                <!-- Content Header (Page header) -->
+                <div class="content-header">
+                    <div class="container-fluid">
+                        <div class="row mb-2">
+                            <div class="col-sm-6">
+                                <h1 class="m-0">
+                                    @yield('title')
+                                </h1>
+                            </div><!-- /.col -->
+                        </div><!-- /.row -->
+                    </div><!-- /.container-fluid -->
                 </div>
-                <!-- /.container-fluid -->
-            </section>
-            <!-- /.Main content -->
+                <!-- /.content-header -->
+
+
+                <!-- Main content -->
+                <section class="content">
+                    <!-- container-fluid -->
+                    <div class="container-fluid">
+
+                        <!-- content -->
+                        <div class="page-modern @yield('page-class')">
+                            @yield('content')
+                        </div>
+                        <!-- /.content -->
+
+                    </div>
+                    <!-- /.container-fluid -->
+                </section>
+                <!-- /.Main content -->
+            </div>
+            <!-- /.content-wrapper -->
         </div>
-        <!-- /.content-wrapper -->
 
         @include('backend.layouts.footer')
 
@@ -185,7 +132,7 @@
                         <i class="fas fa-headset" style="font-size:24px;color:#fff;"></i>
                     </div>
                     <h5 class="mb-0" style="color:#fff;font-weight:700;letter-spacing:1px;">Help & Support</h5>
-                    <small style="color:rgba(255,255,255,.5);">Alkyne Solutions</small>
+                    <small style="color:rgba(255,255,255,.5);">{{ readConfig('studio_name') }}</small>
                 </div>
 
                 <hr style="border-color:rgba(255,255,255,.15);">
@@ -239,7 +186,7 @@
                     For any issue, bug, or new project<br>feel free to reach out anytime.
                 </p>
                 <p style="color:rgba(255,255,255,.2);font-size:9px;text-align:center;margin-top:6px;">
-                    © {{ date('Y') }} Alkyne Solutions
+                    © {{ date('Y') }} {{ readConfig('studio_name') }}
                 </p>
 
             </div>
@@ -282,7 +229,10 @@
     <!-- Select2 -->
     <script src="{{ asset('plugins/select2/js/select2.full.min.js') }}"></script>
     {{-- custom script --}}
-    <script src="{{ asset('js/custom-script.js') }}"></script>
+    <script src="{{ asset('js/custom-script.js') }}?v=7"></script>
+    <script src="{{ asset('js/app-confirm.js') }}?v=3"></script>
+    <script src="{{ asset('js/app-navigation.js') }}?v=6"></script>
+    <script src="{{ asset('js/form-modern.js') }}?v=2"></script>
     <!-- dropzonejs -->
     <script src="{{ asset('plugins/dropzone/min/dropzone.min.js') }}"></script>
 
@@ -290,9 +240,20 @@
     <script src="{{ asset('assets/js/datatable/datatable.js') }}"></script>
     <script src="{{ asset('assets/js/datatable/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatable/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ asset('js/datatable-modern.js') }}?v=3"></script>
 
-    @stack('script')
-    @stack('scripts')
+    <script>
+        window.__vitePosEntry = @json(\Illuminate\Support\Facades\Vite::asset('resources/js/app.jsx'));
+    </script>
+    <script src="{{ asset('js/pos-boot.js') }}?v=1"></script>
+
+    <div id="page-scripts">
+        @stack('script')
+        @stack('scripts')
+    </div>
+
+    @viteReactRefresh
+    @vite('resources/js/app.jsx')
 
     {{-- Notification Bell Live Update --}}
     <script>
@@ -313,12 +274,11 @@
                     list = '<span class="dropdown-item text-center text-muted">No new notifications</span>';
                 } else {
                     data.notifications.forEach(function(n) {
-                        list += '<a href="' + (n.action_url || '#') + '" class="dropdown-item">';
-                        list += '<i class="fas fa-circle mr-2 text-' + n.severity + '"></i>';
-                        list += '<strong>' + n.title + '</strong>';
-                        list += '<span class="float-right text-muted text-sm">' + n.created_at + '</span>';
-                        list += '<br><small>' + n.message.substring(0, 60) + '...</small>';
-                        list += '</a><div class="dropdown-divider"></div>';
+                        list += \'<a href="\' + (n.action_url || \'#\') + \'" class="dropdown-item notification-dropdown-item">\';
+                        list += \'<strong>\' + n.title + \'</strong>\';
+                        list += \'<small class="text-muted d-block">\' + n.message.substring(0, 80) + (n.message.length > 80 ? \'...\' : \'\') + \'</small>\';
+                        list += \'<small class="text-muted">\' + n.created_at + \'</small>\';
+                        list += \'</a><div class="dropdown-divider"></div>\';
                     });
                 }
                 $('#notifList').html(list);

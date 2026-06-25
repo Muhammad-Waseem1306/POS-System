@@ -1,70 +1,67 @@
-<nav class="main-header navbar navbar-expand navbar-white navbar-light">
-    <!-- Left navbar links -->
-    <ul class="navbar-nav">
+<nav class="main-header navbar navbar-expand header-modern">
+    <ul class="navbar-nav header-modern__left">
         <li class="nav-item">
-            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+            <a class="header-icon-btn" data-widget="pushmenu" data-enable-remember="true" data-no-transition-after-reload="true" href="#" role="button" aria-label="Toggle sidebar">
+                <i class="fas fa-bars"></i>
+            </a>
         </li>
-        {{-- <li class="nav-item d-none d-sm-inline-block">
-            <a href="index3.html" class="nav-link">Home</a>
-        </li> --}}
-        {{-- <li class="nav-item d-none d-sm-inline-block">
-            <a href="#" class="nav-link">Contact</a>
-        </li> --}}
     </ul>
 
-    <!-- Right navbar links -->
-    <ul class="navbar-nav ml-auto">
-
+    <ul class="navbar-nav header-modern__actions ml-auto">
         @can('sale_create')
-        <li class="nav-item dropdown">
-            <a class="nav-link btn bg-gradient-primary text-white" href="{{route('backend.admin.cart.index')}}">
-                <i class="fas fa-cart-plus"> POS</i>
+        <li class="nav-item">
+            <a class="header-pos-btn" href="{{ route('backend.admin.cart.index') }}">
+                <i class="fas fa-cart-plus"></i>
+                <span>POS</span>
             </a>
         </li>
         @endcan
-        {{-- Live Notification Bell --}}
+
         <li class="nav-item dropdown" id="notifDropdown">
-            <a class="nav-link" data-toggle="dropdown" href="#" id="notifBell">
+            <a class="header-icon-btn" data-toggle="dropdown" href="#" id="notifBell" aria-label="Notifications">
                 <i class="far fa-bell"></i>
                 @php $unreadNotif = \App\Models\SystemNotification::unreadCount(); @endphp
-                @if($unreadNotif > 0)
-                <span class="badge badge-danger navbar-badge" id="notifBadge">{{ $unreadNotif }}</span>
-                @else
-                <span class="badge badge-danger navbar-badge d-none" id="notifBadge">0</span>
-                @endif
+                <span class="header-icon-btn__badge {{ $unreadNotif > 0 ? '' : 'd-none' }}" id="notifBadge">{{ $unreadNotif }}</span>
             </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" id="notifMenu">
+            <div class="dropdown-menu dropdown-menu-right header-dropdown header-dropdown--wide" id="notifMenu">
                 <span class="dropdown-item dropdown-header" id="notifHeader">Loading...</span>
                 <div class="dropdown-divider"></div>
                 <div id="notifList"></div>
                 <div class="dropdown-divider"></div>
                 <a href="{{ route('backend.admin.notifications.index') }}" class="dropdown-item dropdown-footer">
-                    See All Notifications
+                    See all notifications
                 </a>
             </div>
         </li>
+
         <li class="nav-item">
-            <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+            <a class="header-icon-btn" data-widget="fullscreen" href="#" role="button" aria-label="Fullscreen">
                 <i class="fas fa-expand-arrows-alt"></i>
             </a>
         </li>
+
         <li class="nav-item">
-            <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button" title="Help & Support">
+            <a class="header-icon-btn" data-widget="control-sidebar" data-slide="true" href="#" role="button"
+                title="Help & Support" aria-label="Help and support">
                 <i class="fas fa-question-circle"></i>
             </a>
         </li>
-        <li class="nav-item dropdown">
-            <a class="nav-link" data-toggle="dropdown" href="#">
-                <i class="fas fa-user-circle"></i>
-                <i class="fas fa-angle-double-down"></i>
+
+        <li class="nav-item dropdown header-user-menu">
+            <a class="header-user-btn" data-toggle="dropdown" href="#" aria-label="User menu">
+                <span class="header-user-btn__avatar">
+                    <i class="fas fa-user"></i>
+                </span>
+                <span class="header-user-btn__name d-none d-md-inline">{{ auth()->user()->name }}</span>
+                <i class="fas fa-chevron-down header-user-btn__chevron"></i>
             </a>
-            <div class="dropdown-menu ">
-                <a href="{{ route('backend.admin.profile') }}" class="dropdown-item dropdown-footer">
-                    <i class="fas fa-address-card"></i>
+            <div class="dropdown-menu dropdown-menu-right header-dropdown">
+                <a href="{{ route('backend.admin.profile') }}" class="dropdown-item">
+                    <i class="fas fa-user"></i>
                     Profile
                 </a>
                 <div class="dropdown-divider"></div>
-                <a href="{{ route('logout') }}" class="dropdown-item dropdown-footer">
+                <a href="{{ route('logout') }}" class="dropdown-item dropdown-item--logout" data-partial-nav="false">
                     <i class="fas fa-sign-out-alt"></i>
                     Logout
                 </a>
