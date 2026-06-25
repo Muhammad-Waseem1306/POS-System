@@ -33,20 +33,10 @@ class PurchaseController extends Controller
                 ->addColumn('total', fn($data) => $data->grand_total)
                 ->addColumn('created_at', fn($data) => \Carbon\Carbon::parse($data->date)->format('d M, Y')) // Using Carbon for formatting
                 ->addColumn('action', function ($data) {
-                    return '<div class="btn-group">
-                    <button type="button" class="btn bg-gradient-primary btn-flat">Action</button>
-                    <button type="button" class="btn bg-gradient-primary btn-flat dropdown-toggle dropdown-icon" data-toggle="dropdown" aria-expanded="false">
-                      <span class="sr-only">Toggle Dropdown</span>
-                    </button>
-                    <div class="dropdown-menu" role="menu">
-                      <a class="dropdown-item" href="' . route('backend.admin.purchase.create', ['purchase_id' => $data->id]) . '">
-                    <i class="fas fa-edit"></i> Edit
-                </a> 
-  <a class="dropdown-item" href="' . route('backend.admin.purchase.products', $data->id) . '">
-                <i class="fas fa-eye"></i> View
-            </a>
-                    </div>
-                  </div>';
+                    return table_actions()
+                        ->link(route('backend.admin.purchase.create', ['purchase_id' => $data->id]), 'Edit', 'fas fa-edit')
+                        ->link(route('backend.admin.purchase.products', $data->id), 'View', 'fas fa-eye')
+                        ->render();
                 })
                 ->rawColumns(['supplier', 'id', 'total', 'created_at', 'action'])
                 ->toJson();

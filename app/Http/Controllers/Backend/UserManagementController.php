@@ -35,37 +35,34 @@ class UserManagementController extends Controller
                 ->addColumn('created', function ($data) {
                     return date('d M, Y', strtotime($data->created_at));
                 })
-                ->addColumn(
-                    'action',
-                    '<div class="action-wrapper">
-                    <a class="btn btn-sm bg-gradient-primary"
-                        href="{{ route(\'backend.admin.user.edit\', $id) }}">
-                        <i class="fas fa-edit"></i>
-                        Edit
-                    </a>
-                    <a class="btn btn-sm bg-gradient-danger"
-                        href="{{ route(\'backend.admin.user.delete\', $id) }}"
-                        onclick="return confirm(\'Are you sure ?\')">
-                        <i class="fas fa-trash-alt"></i>
-                        Delete
-                    </a>
-                    @if ($is_suspended)
-                        <a class="btn btn-sm bg-gradient-success"
-                            href="{{ route(\'backend.admin.user.suspend\', [\'id\' => $id, \'status\' => 0]) }}">
-                            <i class="fas fa-check-square"></i>
-                            Activate
-                        </a>
-                    @else
-                        <a class="btn btn-sm bg-gradient-warning"
-                            href="{{ route(\'backend.admin.user.suspend\', [\'id\' => $id, \'status\' => 1]) }}"
-                            onclick="return confirm(\'Are you sure ?\')">
-                            <i class="far fa-times-circle"></i>
-                            Suspend
-                        </a>
-                    @endif
-                    
-                </div>'
-                )
+                ->addColumn('action', function ($data) {
+                    $actions = table_actions()
+                        ->link(route('backend.admin.user.edit', $data->id), 'Edit', 'fas fa-edit');
+
+                    if ($data->is_suspended) {
+                        $actions->link(
+                            route('backend.admin.user.suspend', ['id' => $data->id, 'status' => 0]),
+                            'Activate',
+                            'fas fa-check-square'
+                        );
+                    } else {
+                        $actions->confirmLink(
+                            route('backend.admin.user.suspend', ['id' => $data->id, 'status' => 1]),
+                            'Suspend',
+                            'far fa-times-circle',
+                            'Are you sure?'
+                        );
+                    }
+
+                    $actions->confirmLink(
+                        route('backend.admin.user.delete', $data->id),
+                        'Delete',
+                        'fas fa-trash-alt',
+                        'Are you sure?'
+                    );
+
+                    return $actions->render();
+                })
                 ->addColumn('suspend', function ($data) {
                     if ($data->is_suspended == 0) {
                         return '<span class="badge badge-pill badge-success">Active</span>';

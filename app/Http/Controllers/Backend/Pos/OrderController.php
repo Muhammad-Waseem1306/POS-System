@@ -40,17 +40,17 @@ class OrderController extends Controller
                     ? '<span class="badge bg-primary">Paid</span>'
                     : '<span class="badge bg-danger">Due</span>')
                 ->addColumn('action', function ($data) {
-                    $buttons = '';
+                    $actions = table_actions()
+                        ->link(route('backend.admin.orders.invoice', $data->id), 'Invoice', 'fas fa-file-invoice')
+                        ->link(route('backend.admin.orders.pos-invoice', $data->id), 'POS Invoice', 'fas fa-receipt')
+                        ->link(route('backend.admin.orders.transactions', $data->id), 'Transactions', 'fas fa-exchange-alt')
+                        ->link(route('backend.admin.orders.show', $data->id), 'Details', 'fas fa-file-alt');
 
-                    $buttons .= '<a class="btn btn-success btn-sm" href="' . route('backend.admin.orders.invoice', $data->id) . '"><i class="fas fa-file-invoice"></i> Invoice</a>';
-
-                    $buttons .= '<a class="btn btn-secondary btn-sm" href="' . route('backend.admin.orders.pos-invoice', $data->id) . '"><i class="fas fa-file-invoice"></i> Pos Invoice</a>';
                     if (!$data->status) {
-                        $buttons .= '<a class="btn btn-warning btn-sm" href="' . route('backend.admin.due.collection', $data->id) . '"><i class="fas fa-receipt"></i> Due Collection</a>';
+                        $actions->link(route('backend.admin.due.collection', $data->id), 'Due Collection', 'fas fa-hand-holding-usd');
                     }
-                    $buttons .= '<a class="btn btn-primary btn-sm" href="' . route('backend.admin.orders.transactions', $data->id) . '"><i class="fas fa-exchange-alt"></i> Transactions</a>';
-                    $buttons .= '<a class="btn btn-info btn-sm" href="' . route('backend.admin.orders.show', $data->id) . '"><i class="fas fa-file-alt"></i> Details</a>';
-                    return $buttons;
+
+                    return $actions->render();
                 })
                 ->rawColumns(['saleId', 'customer', 'item', 'sub_total', 'discount', 'total', 'paid', 'due', 'status', 'action'])
                 ->toJson();

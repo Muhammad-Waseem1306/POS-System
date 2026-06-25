@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\InstallmentSchedule;
+use App\Support\TableActions;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 
@@ -74,7 +75,9 @@ class InstallmentDashboardController extends Controller
             ->addColumn('days_overdue', fn($r) => now()->diffInDays($r->due_date, false) < 0
                 ? abs(now()->diffInDays($r->due_date)) . ' days'
                 : '-')
-            ->addColumn('action', fn($r) => '<a href="' . route('backend.admin.installments.show', $r->installment_plan_id) . '" class="btn btn-sm btn-info"><i class="fas fa-eye"></i> View</a>')
+            ->addColumn('action', fn($r) => TableActions::view(
+                route('backend.admin.installments.show', $r->installment_plan_id)
+            ))
             ->rawColumns(['action'])
             ->toJson();
     }

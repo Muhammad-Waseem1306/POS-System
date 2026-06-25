@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Backend\RolePermission;
 
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Support\PermissionGrouper;
+use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
 
 class PermissionController extends Controller
@@ -12,9 +12,15 @@ class PermissionController extends Controller
     // show permission page
     public function index()
     {
-        $permissions = Permission::all();
+        abort_if(! auth()->user()->can('permission_view'), 403);
 
-        return view('backend.settings.permission.index', compact('permissions'));
+        $permissions = Permission::orderBy('name')->get();
+        $visiblePermissions = $permissions->reject(
+            fn (Permission $permission) => in_array($permission->name, config('permissions.excluded_from_permissions_page', []), true)
+        );
+        $permissionGroups = PermissionGrouper::grouped($visiblePermissions);
+
+        return view('backend.settings.permission.index', compact('permissions', 'permissionGroups'));
     }
 
     // create new permission

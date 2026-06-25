@@ -6,6 +6,7 @@ use app;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
+use App\Support\PermissionGrouper;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -13,11 +14,12 @@ class RoleController extends Controller
 {
     // show roles page
     public function index()
-    { 
-       abort_if(!auth()->user()->can('role_view'), 403);
-        $roles = Role::all();
-        $permissions = Permission::all();
-        return view('backend.settings.role.index', compact('roles', 'permissions'));
+    {
+        abort_if(! auth()->user()->can('role_view'), 403);
+
+        $roles = Role::with('permissions')->get();
+
+        return view('backend.settings.role.index', compact('roles'));
     }
 
     // create new role
@@ -38,7 +40,7 @@ class RoleController extends Controller
     // update a role
     public function update(Request $request, $id)
     {
-       abort_if(!auth()->user()->can('currency_update'), 403);
+       abort_if(! auth()->user()->can('role_update'), 403);
         $request->validate([
             'name' => "required|unique:roles,name," . $id
         ]);
@@ -56,10 +58,13 @@ class RoleController extends Controller
     // show permissions
     public function show($id)
     {
-        $role = Role::findOrFail($id);
-        $permissions = Permission::all();
+        abort_if(! auth()->user()->can('role_view'), 403);
 
-        return view('backend.settings.role.permissions', compact('permissions', 'role'));
+        $role = Role::with('permissions')->findOrFail($id);
+        $permissions = Permission::orderBy('name')->get();
+        $permissionGroups = PermissionGrouper::grouped($permissions);
+
+        return view('backend.settings.role.permissions', compact('permissions', 'permissionGroups', 'role'));
     }
 
     // delete a role
@@ -79,7 +84,8 @@ class RoleController extends Controller
     // update permissions of a role
     public function updatePermission(Request $request, $id)
     {
-        // Reset cached roles and permissions
+        abort_if(! auth()->user()->can('role_update'), 403);
+
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
         if ($role = Role::findOrFail($id)) {
             // admin role has everything

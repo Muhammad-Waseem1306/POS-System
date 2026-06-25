@@ -32,21 +32,10 @@ class CategoryController extends Controller
                     ? '<span class="badge bg-primary">Active</span>'
                     : '<span class="badge bg-danger">Inactive</span>')
                 ->addColumn('action', function ($data) {
-                    return '<div class="btn-group">
-                    <button type="button" class="btn bg-gradient-primary btn-flat">Action</button>
-                    <button type="button" class="btn bg-gradient-primary btn-flat dropdown-toggle dropdown-icon" data-toggle="dropdown" aria-expanded="false">
-                      <span class="sr-only">Toggle Dropdown</span>
-                    </button>
-                    <div class="dropdown-menu" role="menu">
-                      <a class="dropdown-item" href="' . route('backend.admin.categories.edit', $data->id) . '" ' . ' >
-                    <i class="fas fa-edit"></i> Edit
-                </a> <div class="dropdown-divider"></div>
-<form action="' . route('backend.admin.categories.destroy', $data->id) . '"method="POST" style="display:inline;">
-                   ' . csrf_field() . '
-                    ' . method_field("DELETE") . '
-<button type="submit" class="dropdown-item" onclick="return confirm(\'Are you sure ?\')"><i class="fas fa-trash"></i> Delete</button>
-                  </form>
-                  </div>';
+                    return table_actions()
+                        ->link(route('backend.admin.categories.edit', $data->id), 'Edit', 'fas fa-edit')
+                        ->delete(route('backend.admin.categories.destroy', $data->id))
+                        ->render();
                 })
                 ->rawColumns(['image', 'name', 'status', 'action'])
                 ->toJson();

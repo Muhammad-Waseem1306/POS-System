@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Models\CashRegister;
 use App\Models\OrderTransaction;
+use App\Support\TableActions;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 
@@ -28,7 +29,12 @@ class CashRegisterController extends Controller
                     : '<span class="badge bg-secondary">Closed</span>')
                 ->addColumn('opened_by', fn($r) => $r->openedBy->name ?? '-')
                 ->addColumn('action', fn($r) => $r->status === 'closed'
-                    ? '<a href="' . route('backend.admin.cash-register.edit', $r->id) . '" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i> Edit</a>'
+                    ? TableActions::inlineButton(
+                        route('backend.admin.cash-register.edit', $r->id),
+                        'fas fa-edit',
+                        'Edit',
+                        'warning'
+                    )
                     : '-')
                 ->rawColumns(['variance', 'status', 'action'])
                 ->toJson();

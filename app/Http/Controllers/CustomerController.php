@@ -32,47 +32,30 @@ class CustomerController extends Controller
                 ->addColumn('address', fn($data) => $data->address)
                 ->addColumn('created_at', fn($data) => $data->created_at->format('d M, Y')) // Using Carbon for formatting
                 ->addColumn('action', function ($data) {
-                    $actionHtml = '<div class="btn-group">
-        <button type="button" class="btn bg-gradient-primary btn-flat">Action</button>
-        <button type="button" class="btn bg-gradient-primary btn-flat dropdown-toggle dropdown-icon" data-toggle="dropdown" aria-expanded="false">
-            <span class="sr-only">Toggle Dropdown</span>
-        </button>
-        <div class="dropdown-menu" role="menu">';
+                    $actions = table_actions();
 
-                    // Check if the user has permission to update customers
                     if (auth()->user()->can('customer_view')) {
-                        $actionHtml .= '<a class="dropdown-item" href="' . route('backend.admin.customers.show', $data->id) . '">
-            <i class="fas fa-eye"></i> View
-        </a>';
-                        $actionHtml .= '<div class="dropdown-divider"></div>';
-                    }
-                    if (auth()->user()->can('customer_update')) {
-                        $actionHtml .= '<a class="dropdown-item" href="' . route('backend.admin.customers.edit', $data->id) . '" ' . ($data->id == 1 ? 'onclick="event.preventDefault();"' : '') . '>
-            <i class="fas fa-edit"></i> Edit
-        </a>';
-                        $actionHtml .= '<div class="dropdown-divider"></div>';
+                        $actions->link(route('backend.admin.customers.show', $data->id), 'View', 'fas fa-eye');
                     }
 
-                    // Check if the user has permission to delete customers
+                    if (auth()->user()->can('customer_update')) {
+                        $actions->link(route('backend.admin.customers.edit', $data->id), 'Edit', 'fas fa-edit');
+                    }
+
                     if (auth()->user()->can('customer_delete')) {
-                        $actionHtml .= '<form action="' . route('backend.admin.customers.destroy', $data->id) . '" method="POST" style="display:inline;">
-            ' . csrf_field() . '
-            ' . method_field("DELETE") . '
-            <button type="submit" ' . ($data->id == 1 ? 'disabled' : '') . ' class="dropdown-item" onclick="return confirm(\'Are you sure?\')">
-                <i class="fas fa-trash"></i> Delete
-            </button>
-        </form>';
-                        $actionHtml .= '<div class="dropdown-divider"></div>';
+                        $actions->delete(
+                            route('backend.admin.customers.destroy', $data->id),
+                            $data->id == 1 ? 'System customer cannot be deleted' : 'Delete',
+                            'Are you sure?',
+                            $data->id == 1
+                        );
                     }
 
                     if (auth()->user()->can('customer_sales')) {
-                        $actionHtml .= '<a class="dropdown-item" href="' . route('backend.admin.customers.orders', $data->id) . '">
-        <i class="fas fa-cart-plus"></i> Sales
-    </a>';
+                        $actions->link(route('backend.admin.customers.orders', $data->id), 'Sales', 'fas fa-cart-plus');
                     }
 
-                    $actionHtml .= '</div></div>';
-                    return $actionHtml;
+                    return $actions->render();
                 })
 
                 ->rawColumns(['name', 'phone', 'address', 'created_at', 'action'])
@@ -164,7 +147,7 @@ class CustomerController extends Controller
     {
 
         abort_if(!auth()->user()->can('customer_update'), 403);
-        $customer = Customer::findOrFail($id);
+        $customer = Customer::with('documents', 'guarantors.documents')->findOrFail($id);
         return view('backend.customers.edit', compact('customer'));
     }
 
