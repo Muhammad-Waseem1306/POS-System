@@ -1,25 +1,54 @@
 // import './bootstrap';
-import React from 'react'
-import Pos from "./components/Pos";
-import Purchase from './components/Purchase/Purchase';
+import React from 'react';
 import { createRoot } from 'react-dom/client';
-// export default function app() {
-//   return (
-//     <Pos />
-//   )
-// }
+import Pos from './components/Pos';
+import Purchase from './components/Purchase/Purchase';
+import './bootstrap';
 
-// Check for the 'cart' element and render the 'cart' component using createRoot
-if (document.getElementById("cart")) {
-    const cartRoot = createRoot(document.getElementById("cart"));
-    cartRoot.render(<Pos />);
+const mounts = {
+    cart: { container: null, root: null },
+    purchase: { container: null, root: null },
+};
+
+function mountApp(key, elementId, Component) {
+    const el = document.getElementById(elementId);
+    const state = mounts[key];
+
+    if (!el) {
+        if (state.root) {
+            state.root.unmount();
+            state.root = null;
+            state.container = null;
+        }
+        return;
+    }
+
+    const stillLoading = !!el.querySelector('.pos-shell__loading');
+
+    if (state.container === el && !stillLoading) {
+        return;
+    }
+
+    if (state.root) {
+        state.root.unmount();
+    }
+
+    state.container = el;
+    state.root = createRoot(el);
+    state.root.render(<Component />);
 }
 
-// Check for the 'purchase' element and render the 'Purchase' component using createRoot
-if (document.getElementById("purchase")) {
-    const purchaseRoot = createRoot(
-        document.getElementById("purchase")
-    );
-    purchaseRoot.render(<Purchase />);
+function mountReactApps() {
+    mountApp('cart', 'cart', Pos);
+    mountApp('purchase', 'purchase', Purchase);
 }
 
+window.mountReactApps = mountReactApps;
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mountReactApps);
+} else {
+    mountReactApps();
+}
+
+document.addEventListener('app:page-loaded', mountReactApps);

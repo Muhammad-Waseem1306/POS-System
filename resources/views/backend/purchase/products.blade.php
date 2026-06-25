@@ -3,7 +3,7 @@
 @section('title', 'Customers')
 
 @section('content')
-<div class="card">
+<div class="content-card">
   <div class="card-body p-2 p-md-4 pt-0">
     <div class="row invoice-info">
       <div class="col-sm-4 invoice-col">
@@ -16,7 +16,7 @@
     <div class="row g-4">
       <div class="col-md-12">
         <div class="card-body table-responsive p-0" id="table_data">
-          <table id="datatables" class="table table-bordered text-center">
+          <table id="datatables" class="table table-modern text-center mb-0">
             <thead>
               <tr>
                 <th data-orderable="false">#</th>
@@ -85,12 +85,13 @@
       </div>
       <!-- /.col -->
     </div>
-    <!-- <div class="row no-print">
-      <div class="col-12">
-        <button type="button" onclick="window.print()" class="btn btn-success float-right"><i class="fas fa-print"></i> Print</a>
+    <div class="row no-print mt-3">
+      <div class="col-12 text-end">
+        <button type="button" onclick="window.print()" class="btn btn-modern btn-modern--primary">
+          <i class="fas fa-print"></i> Print
         </button>
       </div>
-    </div> -->
+    </div>
   </div>
 </div>
 @endsection

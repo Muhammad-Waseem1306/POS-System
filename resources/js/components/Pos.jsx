@@ -1,10 +1,10 @@
 import React, {useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import Swal from "sweetalert2";
 import Cart from "./Cart";
 import toast, { Toaster } from "react-hot-toast";
 import CustomerSelect from "./CutomerSelect";
 import GuarantorSelect from "./GuarantorSelect";
+import { confirmAction } from "../utils/confirmAction";
 
 import SuccessSound from "../sounds/beep-07a.mp3";
 import WarningSound from "../sounds/beep-02.mp3";
@@ -155,33 +155,27 @@ export default function Pos() {
         if (total <= 0) {
             return;
         }
-        Swal.fire({
-            title: "Are you sure you want to delete Cart?",
-            showDenyButton: true,
-            confirmButtonText: "Yes",
-            denyButtonText: "No",
-            customClass: {
-                actions: "my-actions",
-                cancelButton: "order-1 right-gap",
-                confirmButton: "order-2",
-                denyButton: "order-3",
-            },
-        }).then((result) => {
-            if (result.isConfirmed) {
-                axios
-                    .put("/admin/cart/empty")
-                    .then((res) => {
-                        setCartUpdated(!cartUpdated);
-                        playSound(SuccessSound);
-                        toast.success(res?.data?.message);
-                    })
-                    .catch((err) => {
-                        playSound(WarningSound);
-                        toast.error(err.response.data.message);
-                    });
-            } else if (result.isDenied) {
+        confirmAction({
+            title: "Clear cart",
+            text: "Are you sure you want to delete the cart?",
+            confirmText: "Clear cart",
+            variant: "danger",
+        }).then((confirmed) => {
+            if (!confirmed) {
                 return;
             }
+
+            axios
+                .put("/admin/cart/empty")
+                .then((res) => {
+                    setCartUpdated(!cartUpdated);
+                    playSound(SuccessSound);
+                    toast.success(res?.data?.message);
+                })
+                .catch((err) => {
+                    playSound(WarningSound);
+                    toast.error(err.response.data.message);
+                });
         });
     }
     function orderCreate() {
@@ -192,229 +186,121 @@ export default function Pos() {
             toast.error("Please select customer");
             return;
         }
-        Swal.fire({
-            title: `Are you sure you want to complete this order? <br>Due: ${due}`,
-            showDenyButton: true,
-            confirmButtonText: "Yes",
-            denyButtonText: "No",
-            customClass: {
-                actions: "my-actions",
-                cancelButton: "order-1 right-gap",
-                confirmButton: "order-2",
-                denyButton: "order-3",
-            },
-        }).then((result) => {
-            if (result.isConfirmed) {
-                axios
-                    .put("/admin/order/create", {
-                        customer_id: customerId,
-                        order_discount: parseFloat(orderDiscount) || 0,
-                        paid: parseFloat(paid) || 0,
-                        sale_type: saleType,
-                        installment_months: saleType === 'installment' ? installmentMonths : undefined,
-                        guarantor_id: saleType === 'installment' ? selectedGuarantorId : undefined,
-                    })
-                    .then((res) => {
-                        setCartUpdated(!cartUpdated);
-                        setProductUpdated(!productUpdated);
-                        toast.success(res?.data?.message);
-                        // window.location.href = `orders/invoice/${res?.data?.order?.id}`;
-                        window.location.href = `orders/pos-invoice/${res?.data?.order?.id}`;
-                    })
-                    .catch((err) => {
-                        toast.error(err.response.data.message);
-                    });
-            } else if (result.isDenied) {
+        confirmAction({
+            title: "Complete order",
+            html: `Are you sure you want to complete this order?<br><strong>Due: ${due}</strong>`,
+            confirmText: "Complete order",
+        }).then((confirmed) => {
+            if (!confirmed) {
                 return;
             }
+
+            axios
+                .put("/admin/order/create", {
+                    customer_id: customerId,
+                    order_discount: parseFloat(orderDiscount) || 0,
+                    paid: parseFloat(paid) || 0,
+                    sale_type: saleType,
+                    installment_months: saleType === 'installment' ? installmentMonths : undefined,
+                    guarantor_id: saleType === 'installment' ? selectedGuarantorId : undefined,
+                })
+                .then((res) => {
+                    setCartUpdated(!cartUpdated);
+                    setProductUpdated(!productUpdated);
+                    toast.success(res?.data?.message);
+                    window.location.href = `orders/pos-invoice/${res?.data?.order?.id}`;
+                })
+                .catch((err) => {
+                    toast.error(err.response.data.message);
+                });
         });
     }
     return (
         <>
-            <div className="card">
-                {/* <div class="mt-n5 mb-3 d-flex justify-content-end">
-                    <a
-                        href="/admin"
-                        className="btn bg-gradient-primary mr-2"
-                    >
-                        Dashboard
-                    </a>
-                    <a
-                        href="/admin/ordersma"
-                        className="btn bg-gradient-primary"
-                    >
-                        Orders
-                    </a>
-                </div> */}
+            <div className="pos-layout">
+                <aside className="pos-layout__cart">
+                    <div className="content-card">
+                        <div className="pos-section__header">Customer</div>
+                        <div className="pos-section__body">
+                            <CustomerSelect setCustomerId={setCustomerId} />
+                        </div>
+                    </div>
 
-                <div className="card-body p-2 p-md-4 pt-0">
-                    <div className="row">
-                        <div className="col-md-6 col-lg-5 mb-2">
-                            <div className="row mb-2">
-                                <div className="col-12">
-                                    <CustomerSelect
-                                        setCustomerId={setCustomerId}
-                                    />
-                                </div>
-                                {/* <div className="col-6">
-                                <form className="form">
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        placeholder="Enter barcode"
-                                        value={searchQuery}
-                                        onChange={(e) =>
-                                            setSearchQuery(e.target.value)
-                                        }
-                                    />
-                                </form>
-                            </div> */}
-                            </div>
+                    <div className="content-card pos-cart-card">
+                        <div className="pos-section__header">Cart</div>
+                        <div className="pos-section__body pos-section__body--flush">
                             <Cart
                                 carts={carts}
                                 setCartUpdated={setCartUpdated}
                                 cartUpdated={cartUpdated}
                             />
-                            <div className="card">
-                                <div className="card-body">
-                                    <div className="row text-bold mb-1">
-                                        <div className="col">Sub Total:</div>
-                                        <div className="col text-right mr-2">
-                                            {total}
-                                        </div>
-                                    </div>
-                                    <div className="row text-bold mb-1">
-                                        <div className="col">Sale Type:</div>
-                                        <div className="col text-right mr-2">
-                                            <select
-                                                className="form-control form-control-sm"
-                                                value={saleType}
-                                                onChange={(e) => setSaleType(e.target.value)}
-                                                disabled={total <= 0}
-                                            >
-                                                <option value="cash">Cash</option>
-                                                <option value="installment">Installment</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    {saleType === 'installment' && (
-                                        <>
-                                            <div className="row text-bold mb-1">
-                                                <div className="col">Guarantor:</div>
-                                                <div className="col text-right mr-2">
-                                                    <GuarantorSelect customerId={customerId} setGuarantorId={setSelectedGuarantorId} />
-                                                </div>
-                                            </div>
-                                            <div className="row text-bold mb-1">
-                                                <div className="col">Installment Months:</div>
-                                                <div className="col text-right mr-2">
-                                                    <input
-                                                        type="number"
-                                                        className="form-control form-control-sm"
-                                                        placeholder="Months"
-                                                        min={1}
-                                                        disabled={total <= 0}
-                                                        value={installmentMonths}
-                                                        onChange={(e) => setInstallmentMonths(Number(e.target.value) || 1)}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="row text-bold mb-1">
-                                                <div className="col">Down Payment:</div>
-                                                <div className="col text-right mr-2">
-                                                    <input
-                                                        type="number"
-                                                        className="form-control form-control-sm"
-                                                        placeholder="Enter down payment"
-                                                        min={0}
-                                                        max={updateTotal}
-                                                        disabled={total <= 0}
-                                                        value={paid}
-                                                        onChange={(e) => {
-                                                            const value = e.target.value;
-                                                            if (parseFloat(value) < 0 || parseFloat(value) > updateTotal) {
-                                                                return;
-                                                            }
-                                                            setPaid(value);
-                                                        }}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </>
-                                    )}
-                                    <div className="row text-bold mb-1">
-                                        <div className="col">Discount:</div>
-                                        <div className="col text-right mr-2">
-                                            <input
-                                                type="number"
-                                                className="form-control form-control-sm"
-                                                placeholder="Enter discount"
-                                                min={0}
-                                                disabled={total <= 0}
-                                                value={orderDiscount}
-                                                onChange={(e) => {
-                                                    const value =
-                                                        e.target.value;
-                                                    if (
-                                                        parseFloat(value) >
-                                                            total ||
-                                                        parseFloat(value) < 0
-                                                    ) {
-                                                        return;
-                                                    }
-                                                    setOrderDiscount(value);
-                                                }}
+                        </div>
+                    </div>
+
+                    <div className="content-card pos-summary-card">
+                        <div className="pos-section__header">Payment</div>
+                        <div className="pos-section__body pos-section__body--compact">
+                            <div className="pos-field-row">
+                                <span className="pos-field-row__label">Sub Total</span>
+                                <span className="pos-field-row__value">{total}</span>
+                            </div>
+                            <div className="pos-field-row">
+                                <span className="pos-field-row__label">Sale Type</span>
+                                <div className="pos-field-row__value">
+                                    <select
+                                        className="form-control form-control-sm"
+                                        value={saleType}
+                                        onChange={(e) => setSaleType(e.target.value)}
+                                        disabled={total <= 0}
+                                    >
+                                        <option value="cash">Cash</option>
+                                        <option value="installment">Installment</option>
+                                    </select>
+                                </div>
+                            </div>
+                            {saleType === "installment" && (
+                                <>
+                                    <div className="pos-field-row">
+                                        <span className="pos-field-row__label">Guarantor</span>
+                                        <div className="pos-field-row__value">
+                                            <GuarantorSelect
+                                                customerId={customerId}
+                                                setGuarantorId={setSelectedGuarantorId}
                                             />
                                         </div>
                                     </div>
-                                    <div className="row text-bold mb-1">
-                                        <div className="col">
-                                            Apply Fractional Discount:
-                                        </div>
-                                        <div className="col text-right mr-2">
-                                            <input
-                                                type="checkbox"
-                                                className="form-control-sm"
-                                                disabled={total <= 0}
-                                                onChange={(e) => {
-                                                    if (e.target.checked) {
-                                                        const fractionalPart =
-                                                            total % 1;
-                                                        setOrderDiscount(
-                                                            fractionalPart?.toFixed(
-                                                                2
-                                                            )
-                                                        );
-                                                    } else {
-                                                        setOrderDiscount(0);
-                                                    }
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="row text-bold mb-1">
-                                        <div className="col">Total:</div>
-                                        <div className="col text-right mr-2">
-                                            {updateTotal}
-                                        </div>
-                                    </div>
-                                    <div className="row text-bold mb-1">
-                                        <div className="col">Paid:</div>
-                                        <div className="col text-right mr-2">
+                                    <div className="pos-field-row">
+                                        <span className="pos-field-row__label">Installment Months</span>
+                                        <div className="pos-field-row__value">
                                             <input
                                                 type="number"
                                                 className="form-control form-control-sm"
-                                                placeholder="Enter paid"
+                                                placeholder="Months"
+                                                min={1}
+                                                disabled={total <= 0}
+                                                value={installmentMonths}
+                                                onChange={(e) =>
+                                                    setInstallmentMonths(Number(e.target.value) || 1)
+                                                }
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="pos-field-row">
+                                        <span className="pos-field-row__label">Down Payment</span>
+                                        <div className="pos-field-row__value">
+                                            <input
+                                                type="number"
+                                                className="form-control form-control-sm"
+                                                placeholder="Enter down payment"
                                                 min={0}
+                                                max={updateTotal}
                                                 disabled={total <= 0}
                                                 value={paid}
                                                 onChange={(e) => {
-                                                    const value =
-                                                        e.target.value;
+                                                    const value = e.target.value;
                                                     if (
                                                         parseFloat(value) < 0 ||
-                                                        parseFloat(value) >
-                                                            updateTotal
+                                                        parseFloat(value) > updateTotal
                                                     ) {
                                                         return;
                                                     }
@@ -423,84 +309,153 @@ export default function Pos() {
                                             />
                                         </div>
                                     </div>
-                                    <div className="row text-bold">
-                                        <div className="col">Due:</div>
-                                        <div className="col text-right mr-2">
-                                            {due}
-                                        </div>
-                                    </div>
+                                </>
+                            )}
+                            <div className="pos-field-row">
+                                <span className="pos-field-row__label">Discount</span>
+                                <div className="pos-field-row__value">
+                                    <input
+                                        type="number"
+                                        className="form-control form-control-sm"
+                                        placeholder="Enter discount"
+                                        min={0}
+                                        disabled={total <= 0}
+                                        value={orderDiscount}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (parseFloat(value) > total || parseFloat(value) < 0) {
+                                                return;
+                                            }
+                                            setOrderDiscount(value);
+                                        }}
+                                    />
                                 </div>
                             </div>
-                            <div className="row">
-                                <div className="col">
-                                    <button
-                                        onClick={() => cartEmpty()}
-                                        type="button"
-                                        className="btn bg-gradient-danger btn-block text-white text-bold"
-                                    >
-                                        Clear Cart
-                                    </button>
-                                </div>
-                                <div className="col">
-                                    <button
-                                        onClick={() => {
-                                            orderCreate();
+                            <div className="pos-field-row pos-field-row--checkbox">
+                                <label className="pos-field-row__check">
+                                    <input
+                                        type="checkbox"
+                                        disabled={total <= 0}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                const fractionalPart = total % 1;
+                                                setOrderDiscount(fractionalPart?.toFixed(2));
+                                            } else {
+                                                setOrderDiscount(0);
+                                            }
                                         }}
-                                        type="button"
-                                        className="btn bg-gradient-primary btn-block text-white text-bold"
-                                    >
-                                        Checkout
-                                    </button>
+                                    />
+                                    <span>Apply fractional discount</span>
+                                </label>
+                            </div>
+                            <div className="pos-field-row pos-field-row--total">
+                                <span className="pos-field-row__label">Total</span>
+                                <span className="pos-field-row__value">{updateTotal}</span>
+                            </div>
+                            {saleType !== "installment" && (
+                                <div className="pos-field-row">
+                                    <span className="pos-field-row__label">Paid</span>
+                                    <div className="pos-field-row__value">
+                                        <input
+                                            type="number"
+                                            className="form-control form-control-sm"
+                                            placeholder="Enter paid"
+                                            min={0}
+                                            disabled={total <= 0}
+                                            value={paid}
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                if (
+                                                    parseFloat(value) < 0 ||
+                                                    parseFloat(value) > updateTotal
+                                                ) {
+                                                    return;
+                                                }
+                                                setPaid(value);
+                                            }}
+                                        />
+                                    </div>
                                 </div>
+                            )}
+                            <div className="pos-field-row pos-field-row--due">
+                                <span className="pos-field-row__label">Due</span>
+                                <span className="pos-field-row__value">{due}</span>
                             </div>
                         </div>
-                        <div className="col-md-6 col-lg-7">
-                            <div className="row">
-                                <div className="input-group mb-2 col-md-6">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">
-                                            <i class="fas fa-barcode"></i>
+                        <div className="pos-footer pos-actions">
+                            <button
+                                onClick={() => cartEmpty()}
+                                type="button"
+                                className="btn btn-modern btn-modern--ghost"
+                            >
+                                Clear Cart
+                            </button>
+                            <button
+                                onClick={() => orderCreate()}
+                                type="button"
+                                className="btn btn-modern btn-modern--primary"
+                            >
+                                Checkout
+                            </button>
+                        </div>
+                    </div>
+                </aside>
+
+                <main className="pos-layout__products">
+                    <div className="content-card pos-products-card">
+                        <div className="pos-section__header">Products</div>
+                        <div className="pos-section__body">
+                            <div className="pos-search-row">
+                                <div className="pos-search-bar">
+                                    <div className="pos-search-bar__field">
+                                        <span className="pos-search-bar__icon">
+                                            <i className="fas fa-barcode"></i>
                                         </span>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            placeholder="Scan or enter barcode"
+                                            value={searchBarcode}
+                                            autoFocus
+                                            onChange={(e) => setSearchBarcode(e.target.value)}
+                                        />
                                     </div>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        placeholder="Enter Product Barcode"
-                                        value={searchBarcode}
-                                        autoFocus
-                                        onChange={(e) =>
-                                            setSearchBarcode(e.target.value)
-                                        }
-                                    />
                                 </div>
-                                <div className="mb-2 col-md-6">
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        placeholder="Enter Product Name"
-                                        value={searchQuery}
-                                        onChange={(e) =>
-                                            setSearchQuery(e.target.value)
-                                        }
-                                    />
+                                <div className="pos-search-bar">
+                                    <div className="pos-search-bar__field">
+                                        <span className="pos-search-bar__icon">
+                                            <i className="fas fa-search"></i>
+                                        </span>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            placeholder="Search by product name"
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                             <div className="row products-card-container">
-                                {products.length > 0 &&
+                                {products.length > 0 ? (
                                     products.map((product, index) => (
                                         <div
-                                            onClick={() =>
-                                                addProductToCart(product.id)
-                                            }
-                                            className="col-6 col-md-4 col-lg-3 mb-3"
+                                            onClick={() => addProductToCart(product.id)}
+                                            className="col-6 col-md-4 col-lg-3 mb-3 pos-product-col"
                                             key={index}
-                                            style={{ cursor: "pointer" }}
+                                            role="button"
+                                            tabIndex={0}
+                                            onKeyDown={(e) => {
+                                                if (e.key === "Enter" || e.key === " ") {
+                                                    addProductToCart(product.id);
+                                                }
+                                            }}
                                         >
-                                            <div className="text-center">
+                                            <div className="pos-product-card text-center">
                                                 <img
                                                     src={`${fullDomainWithPort}/storage/${product.image}`}
                                                     alt={product.name}
-                                                    className="mr-2 img-thumb"
+                                                    className="img-thumb"
                                                     onError={(e) => {
                                                         e.target.onerror = null;
                                                         e.target.src = `${fullDomainWithPort}/assets/images/no-image.png`;
@@ -509,29 +464,27 @@ export default function Pos() {
                                                     height={100}
                                                 />
                                                 <div className="product-details">
-                                                    <p className="mb-0 text-bold product-name">
-                                                        {product.name} (
-                                                        {product.quantity})
+                                                    <p className="product-name">
+                                                        {product.name} ({product.quantity})
                                                     </p>
-                                                    <p>
-                                                        Price:{" "}
-                                                        {
-                                                            product?.discounted_price
-                                                        }
-                                                    </p>
+                                                    <p>Price: {product?.discounted_price}</p>
                                                 </div>
                                             </div>
                                         </div>
-                                    ))}
+                                    ))
+                                ) : (
+                                    <div className="col-12">
+                                        <div className="pos-empty-state pos-empty-state--products">
+                                            <i className="fas fa-box-open" aria-hidden="true"></i>
+                                            <p>Search or scan to add products</p>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                            {loading && (
-                                <div className="loading-more">
-                                    Loading more...
-                                </div>
-                            )}
+                            {loading && <div className="loading-more">Loading more…</div>}
                         </div>
                     </div>
-                </div>
+                </main>
             </div>
             <Toaster position="top-right" reverseOrder={false} />
         </>

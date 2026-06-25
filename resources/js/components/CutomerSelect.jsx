@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import CreatableSelect from "react-select/creatable";
 import axios from "axios";
 
+import { posSelectProps } from "../utils/posSelectProps";
+
 const CustomerSelect = ({ setCustomerId }) => {
     const [customers, setCustomers] = useState([]);
     const [selectedCustomer, setSelectedCustomer] = useState({value:1,label:"Walking Customer"});
@@ -43,6 +45,7 @@ const CustomerSelect = ({ setCustomerId }) => {
 
     return (
         <CreatableSelect
+            {...posSelectProps}
             isClearable
             options={customers}
             onChange={handleChange}

@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
 import Suppliers from "./Suppliers";
 import axios from "axios";
-import Swal from "sweetalert2";
 import toast, { Toaster } from "react-hot-toast";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { confirmAction } from "../../utils/confirmAction";
 
 export default function Purchase() {
     const [searchTerm, setSearchTerm] = useState("");
@@ -220,26 +220,16 @@ export default function Purchase() {
             return;
         }
 
-        // Show confirmation dialog
-        Swal.fire({
-            title: `Are you sure you want to save this purchase?`,
-            showDenyButton: true,
-            confirmButtonText: "Yes",
-            denyButtonText: "No",
-            customClass: {
-                actions: "my-actions",
-                cancelButton: "order-1 right-gap",
-                confirmButton: "order-2",
-                denyButton: "order-3",
-            },
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                //    console.log("data:", {
-                //        products,
-                //        supplierId,
-                //        totals,
-                //    }); return;
-                try {
+        confirmAction({
+            title: "Save purchase",
+            text: "Are you sure you want to save this purchase?",
+            confirmText: "Save purchase",
+        }).then(async (confirmed) => {
+            if (!confirmed) {
+                return;
+            }
+
+            try {
                     const res = await axios.post("/admin/purchase", {
                         purchase_id: purchaseId,
                         date,
@@ -255,7 +245,6 @@ export default function Purchase() {
                         err.response?.data?.message || "An error occurred"
                     );
                 }
-            }
         });
     };
 
@@ -319,38 +308,34 @@ export default function Purchase() {
     };
     return (
         <>
-            <div className="container-fluid">
-                <div className="card">
-                    <div className="card-body">
+            <div className="pos-shell">
+                <div className="content-card">
+                    <div className="pos-section__header">Purchase Details</div>
+                    <div className="pos-section__body">
                         <div className="row">
                             <div className="mb-3 col-md-6">
                                 <label htmlFor="date" className="form-label">
                                     Purchase Date
                                     <span className="text-danger">*</span>
                                 </label>
-                                <div>
-                                    <DatePicker
-                                        name="date"
-                                        className="form-control"
-                                        placeholderText="Enter purchase date"
-                                        selected={date ? new Date(date) : null}
-                                        dateFormat="yyyy-MM-dd"
-                                        popperProps={{ strategy: "fixed" }}
-                                        popperPlacement="bottom-start"
-                                        onChange={(d) => {
-                                            const formattedDate = d
-                                                ? d.toISOString().split("T")[0]
-                                                : null;
-                                            setDate(formattedDate);
-                                        }}
-                                    />
-                                </div>
+                                <DatePicker
+                                    name="date"
+                                    className="form-control"
+                                    placeholderText="Enter purchase date"
+                                    selected={date ? new Date(date) : null}
+                                    dateFormat="yyyy-MM-dd"
+                                    popperProps={{ strategy: "fixed" }}
+                                    popperPlacement="bottom-start"
+                                    onChange={(d) => {
+                                        const formattedDate = d
+                                            ? d.toISOString().split("T")[0]
+                                            : null;
+                                        setDate(formattedDate);
+                                    }}
+                                />
                             </div>
                             <div className="mb-3 col-md-6">
-                                <label
-                                    htmlFor="supplier"
-                                    className="form-label"
-                                >
+                                <label htmlFor="supplier" className="form-label">
                                     Supplier
                                     <span className="text-danger">*</span>
                                 </label>
@@ -362,252 +347,189 @@ export default function Purchase() {
                         </div>
                     </div>
                 </div>
-                <div className="card">
-                    <div className="card-body">
-                        <div className="row mb-2">
-                            <div className="input-group col-6">
-                                <div className="input-group-prepend">
-                                    <span className="input-group-text">
-                                        <i className="fas fa-search"></i>
-                                    </span>
-                                </div>
+
+                <div className="content-card">
+                    <div className="pos-section__header">Line Items</div>
+                    <div className="pos-section__body">
+                        <div className="pos-search-bar mb-3">
+                            <div className="pos-search-bar__field" style={{ flex: 2 }}>
+                                <span className="pos-search-bar__icon">
+                                    <i className="fas fa-search"></i>
+                                </span>
                                 <input
                                     type="search"
-                                    className="form-control form-control-lg"
+                                    className="form-control"
                                     value={searchTerm}
-                                    onChange={(e) =>
-                                        setSearchTerm(e.target.value)
-                                    }
+                                    onChange={(e) => setSearchTerm(e.target.value)}
                                     placeholder="Enter product barcode/name"
                                 />
-                                <button
-                                    className="btn bg-gradient-primary ml-2"
-                                    onClick={handleSearchAdd}
-                                >
-                                    Add Product
-                                </button>
                             </div>
+                            <button
+                                type="button"
+                                className="btn btn-modern btn-modern--primary btn-modern--sm"
+                                onClick={handleSearchAdd}
+                            >
+                                Add Product
+                            </button>
                         </div>
-                        {/* Display search results below the input */}
+
                         {searchResults.length > 0 && (
-                            <div className="row mb-2">
-                                <div
-                                    className="col-6"
-                                    style={{
-                                        maxHeight: "200px",
-                                        overflowY: "auto",
-                                    }}
-                                >
-                                    <ul className="list-group">
-                                        {searchResults.map((product) => (
-                                            <li
-                                                key={product.id}
-                                                className="list-group-item"
-                                                onClick={() =>
-                                                    handleProductSelect(product)
-                                                }
-                                                style={{ cursor: "pointer" }}
-                                            >
-                                                {product.name} - $
-                                                {product.price}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
+                            <ul className="pos-search-results mb-3">
+                                {searchResults.map((product) => (
+                                    <li
+                                        key={product.id}
+                                        className="pos-search-results__item"
+                                        onClick={() => handleProductSelect(product)}
+                                    >
+                                        {product.name} — {product.price}
+                                    </li>
+                                ))}
+                            </ul>
                         )}
-                        <div className="row">
-                            <div className="col-12">
-                                <table className="table table-sm table-bordered text-center">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Product Name</th>
-                                            <th>Purchase Price</th>
-                                            <th>Current Stock</th>
-                                            <th>Qty</th>
-                                            <th>Sub Total</th>
-                                            <th>Action</th>
+
+                        <div className="table-responsive">
+                            <table className="table table-modern text-center">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Product Name</th>
+                                        <th>Purchase Price</th>
+                                        <th>Current Stock</th>
+                                        <th>Qty</th>
+                                        <th>Sub Total</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {products.map((product, index) => (
+                                        <tr key={product.id}>
+                                            <td>{index + 1}</td>
+                                            <td>{product.name}</td>
+                                            <td>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    className="form-control form-control-sm mx-auto"
+                                                    style={{ maxWidth: "6rem" }}
+                                                    value={product.purchase_price}
+                                                    onChange={(e) =>
+                                                        handlePriceChange(product.id, e.target.value)
+                                                    }
+                                                />
+                                            </td>
+                                            <td>{product.stock}</td>
+                                            <td>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    className="form-control form-control-sm mx-auto"
+                                                    style={{ maxWidth: "5rem" }}
+                                                    value={product.qty}
+                                                    onChange={(e) =>
+                                                        handleQtyChange(product.id, e.target.value)
+                                                    }
+                                                />
+                                            </td>
+                                            <td>{product.subTotal.toFixed(2)}</td>
+                                            <td>
+                                                <button
+                                                    type="button"
+                                                    className="pos-qty-btn pos-qty-btn--delete"
+                                                    onClick={() => handleDelete(product.id)}
+                                                    title="Remove"
+                                                >
+                                                    <i className="fas fa-trash"></i>
+                                                </button>
+                                            </td>
                                         </tr>
-                                    </thead>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div className="row mt-3">
+                            <div className="col-md-6 offset-md-6">
+                                <table className="table pos-totals-table">
                                     <tbody>
-                                        {products.map((product, index) => (
-                                            <tr key={product.id}>
-                                                <td>{index + 1}</td>
-                                                <td>{product.name}</td>
-                                                <td className="d-flex align-items-center justify-content-center">
-                                                    <input
-                                                        type="number"
-                                                        min="1"
-                                                        className="form-control w-50"
-                                                        value={
-                                                            product.purchase_price
-                                                        }
-                                                        onChange={(e) =>
-                                                            handlePriceChange(
-                                                                product.id,
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                    />
-                                                </td>
-                                                <td>{product.stock}</td>
-                                                <td className="d-flex align-items-center justify-content-center">
-                                                    <input
-                                                        type="number"
-                                                        min="1"
-                                                        className="form-control w-50"
-                                                        value={product.qty}
-                                                        onChange={(e) =>
-                                                            handleQtyChange(
-                                                                product.id,
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                    />
-                                                </td>
-                                                <td>
-                                                    {product.subTotal.toFixed(
-                                                        2
-                                                    )}
-                                                </td>
-                                                <td>
-                                                    <button
-                                                        className="btn btn-danger btn-sm"
-                                                        onClick={() =>
-                                                            handleDelete(
-                                                                product.id
-                                                            )
-                                                        }
-                                                    >
-                                                        Delete
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
+                                        <tr>
+                                            <th>Subtotal:</th>
+                                            <td>{totals.subTotal.toFixed(2)}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Tax:</th>
+                                            <td>{totals.tax.toFixed(2)}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Discount:</th>
+                                            <td>{totals.discount.toFixed(2)}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Shipping:</th>
+                                            <td>{totals.shipping.toFixed(2)}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Grand Total:</th>
+                                            <td>{totals.grandTotal.toFixed(2)}</td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                        <div className="row">
-                            <div className="col-6"></div>
-                            <div className="col-6">
-                                <div className="table-responsive">
-                                    <table className="table table-sm">
-                                        <tbody>
-                                            <tr>
-                                                <th>Subtotal:</th>
-                                                <td className="text-right">
-                                                    {totals.subTotal.toFixed(2)}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Tax:</th>
-                                                <td className="text-right">
-                                                    {totals.tax.toFixed(2)}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Discount:</th>
-                                                <td className="text-right">
-                                                    {totals.discount.toFixed(2)}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Shipping:</th>
-                                                <td className="text-right">
-                                                    {totals.shipping.toFixed(2)}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Grand Total:</th>
-                                                <td className="text-right">
-                                                    {totals.grandTotal.toFixed(
-                                                        2
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
-                <div className="card">
-                    <div className="card-body">
+
+                <div className="content-card">
+                    <div className="pos-section__header">Adjustments</div>
+                    <div className="pos-section__body">
                         <div className="row">
                             <div className="mb-3 col-md-4">
-                                <label htmlFor="tax" className="form-label">
-                                    Tax
-                                </label>
+                                <label htmlFor="tax" className="form-label">Tax</label>
                                 <input
                                     type="number"
                                     className="form-control"
                                     value={tax}
                                     min="0"
-                                    onChange={(e) =>
-                                        setTax(parseFloat(e.target.value) || 0)
-                                    }
+                                    onChange={(e) => setTax(parseFloat(e.target.value) || 0)}
                                     placeholder="Enter tax"
                                     name="tax"
-                                    required
                                 />
                             </div>
                             <div className="mb-3 col-md-4">
-                                <label
-                                    htmlFor="discount"
-                                    className="form-label"
-                                >
-                                    Discount
-                                </label>
+                                <label htmlFor="discount" className="form-label">Discount</label>
                                 <input
                                     type="number"
                                     min="0"
                                     className="form-control"
                                     value={discount}
-                                    onChange={(e) =>
-                                        setDiscount(
-                                            parseFloat(e.target.value) || 0
-                                        )
-                                    }
+                                    onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
                                     placeholder="Enter discount"
                                     name="discount"
-                                    required
                                 />
                             </div>
                             <div className="mb-3 col-md-4">
-                                <label
-                                    htmlFor="shipping"
-                                    className="form-label"
-                                >
-                                    Shipping Charge
-                                </label>
+                                <label htmlFor="shipping" className="form-label">Shipping Charge</label>
                                 <input
                                     type="number"
                                     min="0"
                                     className="form-control"
                                     value={shipping}
-                                    onChange={(e) =>
-                                        setShipping(
-                                            parseFloat(e.target.value) || 0
-                                        )
-                                    }
+                                    onChange={(e) => setShipping(parseFloat(e.target.value) || 0)}
                                     placeholder="Enter shipping"
                                     name="shipping"
-                                    required
                                 />
                             </div>
                         </div>
                     </div>
+                    <div className="pos-footer">
+                        <button
+                            type="button"
+                            className="btn btn-modern btn-modern--primary"
+                            onClick={handleSubmit}
+                        >
+                            {purchaseId ? "Update Purchase" : "Create Purchase"}
+                        </button>
+                    </div>
                 </div>
-                <button
-                    type="submit"
-                    className="btn btn-md bg-gradient-primary"
-                    onClick={handleSubmit}
-                >
-                    Create
-                </button>
             </div>
 
             <Toaster position="top-right" reverseOrder={false} />

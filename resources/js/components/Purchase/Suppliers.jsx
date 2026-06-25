@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Select from "react-select";
 
+import { posSelectProps } from "../../utils/posSelectProps";
+
 const Suppliers = ({ setSupplierId,oldSupplier }) => {
     const [suppliers, setSuppliers] = useState([]);
     const [selectedSupplier, setSelectedSupplier] = useState(null);
@@ -79,14 +81,12 @@ const Suppliers = ({ setSupplierId,oldSupplier }) => {
     return (
         <div>
             <Select
+                {...posSelectProps}
                 isClearable
                 options={suppliers}
                 onChange={handleChange}
                 value={selectedSupplier}
                 placeholder="Select supplier"
-                menuPortalTarget={document.body}
-                menuPosition="fixed"
-                styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
                 required
             />
             
