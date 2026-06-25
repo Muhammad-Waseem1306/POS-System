@@ -3,157 +3,150 @@
 @section('title', 'Create Customer')
 
 @section('content')
-<div class="card">
-  <div class="card-body">
-    <form action="{{ route('backend.admin.customers.store') }}" method="post" class="accountForm"
-      enctype="multipart/form-data">
-      @csrf
-      <div class="card-body">
-        <div class="row">
-          <div class="mb-3 col-md-6">
-            <label for="title" class="form-label">
-              Name
-              <span class="text-danger">*</span>
-            </label>
-            <input type="text" class="form-control" placeholder="Enter title" name="name"
-              value="{{ old('name') }}" required>
-          </div>
-          <div class="mb-3 col-md-6">
-            <label for="title" class="form-label">
-              Phone
-              <span class="text-danger">*</span>
-            </label>
-            <input type="text" class="form-control" placeholder="Enter phone" name="phone"
-              value="{{ old('phone') }}" required>
-          </div>
-          <div class="mb-3 col-md-6">
-            <label for="cnic" class="form-label">
-              CNIC
-            </label>
-            <input type="text" class="form-control" placeholder="Enter CNIC" name="cnic"
-              value="{{ old('cnic') }}">
-          </div>
-          <div class="mb-3 col-md-6">
-            <label for="title" class="form-label">
-              Address
-            </label>
-            <input type="text" class="form-control" placeholder="Enter Address" name="address"
-              value="{{ old('address') }}">
-          </div>
-        </div>
-        <div class="row mt-3">
-          <div class="col-12">
-            <h5>Verification Documents</h5>
-          </div>
-          <div class="mb-3 col-md-3">
-            <label class="form-label">Customer Photo</label>
-            <input type="file" class="form-control" name="photo" accept="image/*">
-          </div>
-          <div class="mb-3 col-md-3">
-            <label class="form-label">CNIC Front</label>
-            <input type="file" class="form-control" name="cnic_front" accept="image/*,.pdf">
-          </div>
-          <div class="mb-3 col-md-3">
-            <label class="form-label">CNIC Back</label>
-            <input type="file" class="form-control" name="cnic_back" accept="image/*,.pdf">
-          </div>
-          <div class="mb-3 col-md-3">
-            <label class="form-label">Utility Bill</label>
-            <input type="file" class="form-control" name="utility_bill" accept="image/*,.pdf">
-          </div>
-        </div>
-        <div class="row mt-3">
-          <div class="col-12">
-            <h5>Guarantor Details</h5>
-          </div>
-          <div id="guarantorRows">
+<x-form-page
+    :action="route('backend.admin.customers.store')"
+    :cancel-url="route('backend.admin.customers.index')"
+    submit-label="Create Customer"
+    enctype="multipart/form-data"
+>
+    <x-form-section title="Basic Information">
+        <x-form-field label="Name" name="name" required>
+            <input type="text" class="form-control" id="name" placeholder="Enter customer name" name="name"
+                value="{{ old('name') }}" required>
+        </x-form-field>
+        <x-form-field label="Phone" name="phone" required>
+            <input type="text" class="form-control" id="phone" placeholder="Enter phone number" name="phone"
+                value="{{ old('phone') }}" required>
+        </x-form-field>
+        <x-form-field label="CNIC" name="cnic">
+            <input type="text" class="form-control" id="cnic" placeholder="Enter CNIC" name="cnic"
+                value="{{ old('cnic') }}">
+        </x-form-field>
+        <x-form-field label="Address" name="address">
+            <input type="text" class="form-control" id="address" placeholder="Enter address" name="address"
+                value="{{ old('address') }}">
+        </x-form-field>
+    </x-form-section>
+
+    <x-form-section title="Verification Documents" description="Upload customer identity and address documents.">
+        <x-form-field label="Customer Photo" col="md-3">
+            <x-form-file name="photo" accept="image/*" />
+        </x-form-field>
+        <x-form-field label="CNIC Front" col="md-3">
+            <x-form-file name="cnic_front" accept="image/*,.pdf" />
+        </x-form-field>
+        <x-form-field label="CNIC Back" col="md-3">
+            <x-form-file name="cnic_back" accept="image/*,.pdf" />
+        </x-form-field>
+        <x-form-field label="Utility Bill" col="md-3">
+            <x-form-file name="utility_bill" accept="image/*,.pdf" />
+        </x-form-field>
+    </x-form-section>
+
+    <x-form-section title="Guarantor Details">
+        <div class="col-12" id="guarantorRows">
             <div class="row guarantor-row">
-              <div class="mb-3 col-md-4">
-                <label class="form-label">Guarantor Name <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" name="guarantor_name[]" value="{{ old('guarantor_name.0') }}" required>
-              </div>
-              <div class="mb-3 col-md-4">
-                <label class="form-label">Guarantor CNIC <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" name="guarantor_cnic[]" value="{{ old('guarantor_cnic.0') }}" required>
-              </div>
-              <div class="mb-3 col-md-4">
-                <label class="form-label">Guarantor Phone <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" name="guarantor_phone[]" value="{{ old('guarantor_phone.0') }}" required>
-              </div>
-              <div class="mb-3 col-md-4">
-                <label class="form-label">Guarantor Address</label>
-                <input type="text" class="form-control" name="guarantor_address[]" value="{{ old('guarantor_address.0') }}">
-              </div>
-              <div class="mb-3 col-md-4">
-                <label class="form-label">Relationship</label>
-                <input type="text" class="form-control" name="guarantor_relationship[]" value="{{ old('guarantor_relationship.0') }}">
-              </div>
-              <div class="mb-3 col-md-4">
-                <label class="form-label">Document</label>
-                <input type="file" class="form-control" name="guarantor_document[]" accept="image/*,.pdf">
-              </div>
-              <div class="mb-3 col-md-12">
-                <label class="form-label">Notes</label>
-                <textarea class="form-control" name="guarantor_notes[]">{{ old('guarantor_notes.0') }}</textarea>
+                <x-form-field label="Guarantor Name" required col="md-4">
+                    <input type="text" class="form-control" name="guarantor_name[]" value="{{ old('guarantor_name.0') }}" required>
+                </x-form-field>
+                <x-form-field label="Guarantor CNIC" required col="md-4">
+                    <input type="text" class="form-control" name="guarantor_cnic[]" value="{{ old('guarantor_cnic.0') }}" required>
+                </x-form-field>
+                <x-form-field label="Guarantor Phone" required col="md-4">
+                    <input type="text" class="form-control" name="guarantor_phone[]" value="{{ old('guarantor_phone.0') }}" required>
+                </x-form-field>
+                <x-form-field label="Guarantor Address" col="md-4">
+                    <input type="text" class="form-control" name="guarantor_address[]" value="{{ old('guarantor_address.0') }}">
+                </x-form-field>
+                <x-form-field label="Relationship" col="md-4">
+                    <input type="text" class="form-control" name="guarantor_relationship[]" value="{{ old('guarantor_relationship.0') }}">
+                </x-form-field>
+                <x-form-field label="Document" col="md-4">
+                    <x-form-file name="guarantor_document[]" accept="image/*,.pdf" />
+                </x-form-field>
+                <x-form-field label="Notes" col="md-12">
+                    <textarea class="form-control" name="guarantor_notes[]" rows="3">{{ old('guarantor_notes.0') }}</textarea>
+                </x-form-field>
+            </div>
+        </div>
+        <div class="col-12 mb-2">
+            <button type="button" id="addGuarantor" class="btn btn-modern btn-modern--secondary btn-modern--sm">
+                <i class="fas fa-plus"></i> Add Guarantor
+            </button>
+        </div>
+    </x-form-section>
+</x-form-page>
+@endsection
+
+@push('script')
+<script>
+  (function () {
+    function initCustomerGuarantorRows() {
+    const addButton = document.getElementById('addGuarantor');
+    const guarantorRows = document.getElementById('guarantorRows');
+    if (!addButton || !guarantorRows || addButton.dataset.bound === 'true') {
+      return;
+    }
+
+    addButton.dataset.bound = 'true';
+    addButton.addEventListener('click', function () {
+      const row = document.createElement('div');
+      row.classList.add('row', 'guarantor-row', 'mt-2', 'pt-3', 'border-top');
+      row.innerHTML = `
+        <div class="form-field col-12 col-md-4">
+          <label class="form-field__label">Guarantor Name</label>
+          <div class="form-field__control"><input type="text" class="form-control" name="guarantor_name[]"></div>
+        </div>
+        <div class="form-field col-12 col-md-4">
+          <label class="form-field__label">Guarantor CNIC</label>
+          <div class="form-field__control"><input type="text" class="form-control" name="guarantor_cnic[]"></div>
+        </div>
+        <div class="form-field col-12 col-md-4">
+          <label class="form-field__label">Guarantor Phone</label>
+          <div class="form-field__control"><input type="text" class="form-control" name="guarantor_phone[]"></div>
+        </div>
+        <div class="form-field col-12 col-md-4">
+          <label class="form-field__label">Guarantor Address</label>
+          <div class="form-field__control"><input type="text" class="form-control" name="guarantor_address[]"></div>
+        </div>
+        <div class="form-field col-12 col-md-4">
+          <label class="form-field__label">Relationship</label>
+          <div class="form-field__control"><input type="text" class="form-control" name="guarantor_relationship[]"></div>
+        </div>
+        <div class="form-field col-12 col-md-4">
+          <label class="form-field__label">Document</label>
+          <div class="form-field__control">
+            <div class="form-file" data-form-file>
+              <div class="form-file__picker">
+                <input type="file" name="guarantor_document[]" class="form-file__input" accept="image/*,.pdf">
+                <label class="form-file__label">
+                  <span class="form-file__icon" aria-hidden="true"><i class="fas fa-paperclip"></i></span>
+                  <span class="form-file__text">Choose file</span>
+                  <span class="form-file__name" data-file-name data-default-name="No file chosen">No file chosen</span>
+                </label>
               </div>
             </div>
           </div>
-          <div class="mb-3 col-md-12">
-            <button type="button" id="addGuarantor" class="btn btn-secondary">Add Guarantor</button>
-          </div>
         </div>
-        <div class="row">
-          <div class="col-md-6">
-            <button type="submit" class="btn bg-gradient-primary">Create</button>
-          </div>
-        </div>
-      </div>
-      <!-- /.card-body -->
-    </form>
-  </div>
-</div>
-@endsection
-@push('script')
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const addButton = document.getElementById('addGuarantor');
-    const guarantorRows = document.getElementById('guarantorRows');
-
-    addButton.addEventListener('click', function () {
-      const row = document.createElement('div');
-      row.classList.add('row', 'guarantor-row');
-      row.innerHTML = `
-        <div class="mb-3 col-md-4">
-          <label class="form-label">Guarantor Name</label>
-          <input type="text" class="form-control" name="guarantor_name[]">
-        </div>
-        <div class="mb-3 col-md-4">
-          <label class="form-label">Guarantor CNIC</label>
-          <input type="text" class="form-control" name="guarantor_cnic[]">
-        </div>
-        <div class="mb-3 col-md-4">
-          <label class="form-label">Guarantor Phone</label>
-          <input type="text" class="form-control" name="guarantor_phone[]">
-        </div>
-        <div class="mb-3 col-md-4">
-          <label class="form-label">Guarantor Address</label>
-          <input type="text" class="form-control" name="guarantor_address[]">
-        </div>
-        <div class="mb-3 col-md-4">
-          <label class="form-label">Relationship</label>
-          <input type="text" class="form-control" name="guarantor_relationship[]">
-        </div>
-        <div class="mb-3 col-md-4">
-          <label class="form-label">Document</label>
-          <input type="file" class="form-control" name="guarantor_document[]" accept="image/*,.pdf">
-        </div>
-        <div class="mb-3 col-md-12">
-          <label class="form-label">Notes</label>
-          <textarea class="form-control" name="guarantor_notes[]"></textarea>
+        <div class="form-field col-12 col-md-12">
+          <label class="form-field__label">Notes</label>
+          <div class="form-field__control"><textarea class="form-control" name="guarantor_notes[]" rows="3"></textarea></div>
         </div>
       `;
       guarantorRows.appendChild(row);
     });
-  });
+    }
+
+    window.initCustomerGuarantorRows = initCustomerGuarantorRows;
+
+    if (window.__customerGuarantorRowsRegistered) {
+      initCustomerGuarantorRows();
+      return;
+    }
+
+    window.__customerGuarantorRowsRegistered = true;
+    document.addEventListener('DOMContentLoaded', initCustomerGuarantorRows);
+    document.addEventListener('app:page-loaded', initCustomerGuarantorRows);
+  })();
 </script>
 @endpush
