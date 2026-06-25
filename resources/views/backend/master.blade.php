@@ -242,10 +242,24 @@
     <script src="{{ asset('assets/js/datatable/dataTables.buttons.min.js') }}"></script>
     <script src="{{ asset('js/datatable-modern.js') }}?v=3"></script>
 
+    @php
+        $viteBuildEntry = null;
+        $viteManifestPath = public_path('build/manifest.json');
+
+        if (is_file($viteManifestPath)) {
+            $viteManifest = json_decode(file_get_contents($viteManifestPath), true);
+            $viteBuildFile = $viteManifest['resources/js/app.jsx']['file'] ?? null;
+
+            if ($viteBuildFile) {
+                $viteBuildEntry = asset('build/' . $viteBuildFile);
+            }
+        }
+    @endphp
     <script>
         window.__vitePosEntry = @json(\Illuminate\Support\Facades\Vite::asset('resources/js/app.jsx'));
+        window.__vitePosBuild = @json($viteBuildEntry);
     </script>
-    <script src="{{ asset('js/pos-boot.js') }}?v=1"></script>
+    <script src="{{ asset('js/pos-boot.js') }}?v=3"></script>
 
     <div id="page-scripts">
         @stack('script')

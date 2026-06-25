@@ -23,9 +23,9 @@ function mountApp(key, elementId, Component) {
         return;
     }
 
-    const stillLoading = !!el.querySelector('.pos-shell__loading');
+    const needsMount = state.container !== el || !!el.querySelector('.pos-shell__loading');
 
-    if (state.container === el && !stillLoading) {
+    if (!needsMount) {
         return;
     }
 
@@ -45,10 +45,16 @@ function mountReactApps() {
 
 window.mountReactApps = mountReactApps;
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', mountReactApps);
-} else {
-    mountReactApps();
+function scheduleMountReactApps() {
+    window.requestAnimationFrame(function () {
+        mountReactApps();
+    });
 }
 
-document.addEventListener('app:page-loaded', mountReactApps);
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', scheduleMountReactApps);
+} else {
+    scheduleMountReactApps();
+}
+
+document.addEventListener('app:page-loaded', scheduleMountReactApps);
