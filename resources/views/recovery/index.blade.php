@@ -1,83 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>QPOS — Account Recovery</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', sans-serif; background: #0f1923; color: #e0e0e0; min-height: 100vh; padding: 40px 20px; }
-  .container { max-width: 800px; margin: 0 auto; }
-  .header { text-align: center; margin-bottom: 32px; }
-  .header h1 { font-size: 26px; color: #fff; letter-spacing: 2px; }
-  .header p { color: rgba(255,255,255,.4); font-size: 13px; margin-top: 6px; }
-  .warning { background: rgba(233,69,96,.12); border: 1px solid rgba(233,69,96,.4); border-radius: 8px; padding: 12px 18px; margin-bottom: 24px; font-size: 13px; color: #e94560; }
-  .success-msg { background: rgba(52,168,83,.12); border: 1px solid rgba(52,168,83,.4); border-radius: 8px; padding: 12px 18px; margin-bottom: 24px; font-size: 13px; color: #34a853; }
-  .card { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 10px; margin-bottom: 16px; overflow: hidden; }
-  .card-header { background: rgba(255,255,255,.06); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
-  .user-info { display: flex; align-items: center; gap: 14px; }
-  .avatar { width: 40px; height: 40px; background: linear-gradient(135deg,#e94560,#0f3460); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: #fff; }
-  .user-name { font-size: 15px; font-weight: 600; color: #fff; }
-  .user-email { font-size: 12px; color: rgba(255,255,255,.45); margin-top: 2px; }
-  .role-badge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: .5px; }
-  .role-Admin { background: rgba(233,69,96,.2); color: #e94560; border: 1px solid rgba(233,69,96,.4); }
-  .role-cashier { background: rgba(66,133,244,.2); color: #4285f4; border: 1px solid rgba(66,133,244,.4); }
-  .role-sales_associate { background: rgba(52,168,83,.2); color: #34a853; border: 1px solid rgba(52,168,83,.4); }
-  .card-body { padding: 16px 20px; }
-  form { display: flex; gap: 10px; align-items: center; }
-  input[type=password] { flex: 1; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); border-radius: 6px; padding: 8px 12px; color: #fff; font-size: 13px; outline: none; }
-  input[type=password]:focus { border-color: #e94560; }
-  input[type=password]::placeholder { color: rgba(255,255,255,.3); }
-  button { background: #e94560; color: #fff; border: none; border-radius: 6px; padding: 8px 18px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
-  button:hover { background: #c73652; }
-  .footer-note { text-align: center; margin-top: 32px; font-size: 11px; color: rgba(255,255,255,.2); }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Account Recovery | {{ readConfig('site_name') ?? 'QPOS' }}</title>
+    <x-favicon />
+    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/auth-modern.css') }}">
+    <style>
+        body { background: #f8fafc; min-height: 100vh; padding: 2rem 1rem; font-family: "Plus Jakarta Sans", system-ui, sans-serif; }
+        .recovery-shell { max-width: 720px; margin: 0 auto; }
+        .recovery-header { text-align: center; margin-bottom: 2rem; }
+        .recovery-header h1 { font-size: 1.5rem; font-weight: 700; color: #0f172a; margin-bottom: 0.35rem; }
+        .recovery-header p { color: #64748b; font-size: 0.875rem; margin: 0; }
+        .recovery-alert { padding: 0.875rem 1rem; border-radius: 10px; font-size: 0.875rem; margin-bottom: 1.25rem; }
+        .recovery-alert--warning { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+        .recovery-alert--success { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+        .recovery-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; margin-bottom: 1rem; overflow: hidden; box-shadow: 0 1px 3px rgba(15,23,42,0.04); }
+        .recovery-card__header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; padding: 1rem 1.25rem; border-bottom: 1px solid #f1f5f9; }
+        .recovery-user { display: flex; align-items: center; gap: 0.875rem; }
+        .recovery-user__avatar { width: 2.5rem; height: 2.5rem; background: #eff6ff; color: #2563eb; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+        .recovery-user__name { font-weight: 600; color: #0f172a; font-size: 0.9375rem; }
+        .recovery-user__email { font-size: 0.8125rem; color: #64748b; }
+        .recovery-role { padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.6875rem; font-weight: 600; background: #f1f5f9; color: #475569; }
+        .recovery-card__body { padding: 1rem 1.25rem; }
+        .recovery-form { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .recovery-form input[type=password] { flex: 1; min-width: 200px; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.5rem 0.75rem; font-size: 0.875rem; }
+        .recovery-form input:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+        .recovery-form button { background: #2563eb; color: #fff; border: none; border-radius: 10px; padding: 0.5rem 1rem; font-weight: 600; font-size: 0.875rem; cursor: pointer; }
+        .recovery-form button:hover { background: #1d4ed8; }
+        .recovery-footer { text-align: center; margin-top: 2rem; font-size: 0.75rem; color: #94a3b8; }
+    </style>
 </head>
 <body>
-<div class="container">
+<div class="recovery-shell">
+    <div class="recovery-header">
+        <h1>Account Recovery</h1>
+        <p>Local access only — reset account passwords without losing data</p>
+    </div>
 
-  <div class="header">
-    <h1>🔑 QPOS Account Recovery</h1>
-    <p>Local access only &mdash; reset any account password without losing data</p>
-  </div>
+    <div class="recovery-alert recovery-alert--warning">
+        This page is only accessible from this computer. Close it after use.
+    </div>
 
-  <div class="warning">
-    ⚠️ This page is only accessible from this computer. Close it after use.
-  </div>
+    @if(session('success'))
+    <div class="recovery-alert recovery-alert--success">{{ session('success') }}</div>
+    @endif
 
-  @if(session('success'))
-  <div class="success-msg">✅ {{ session('success') }}</div>
-  @endif
-
-  @foreach($users as $user)
-  <div class="card">
-    <div class="card-header">
-      <div class="user-info">
-        <div class="avatar">{{ strtoupper(substr($user->name ?? $user->email, 0, 1)) }}</div>
-        <div>
-          <div class="user-name">{{ $user->name ?? '(no name)' }}</div>
-          <div class="user-email">{{ $user->email }}</div>
+    @foreach($users as $user)
+    <div class="recovery-card">
+        <div class="recovery-card__header">
+            <div class="recovery-user">
+                <div class="recovery-user__avatar">{{ strtoupper(substr($user->name ?? $user->email, 0, 1)) }}</div>
+                <div>
+                    <div class="recovery-user__name">{{ $user->name ?? '(no name)' }}</div>
+                    <div class="recovery-user__email">{{ $user->email }}</div>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-1">
+                @forelse($user->roles as $role)
+                    <span class="recovery-role">{{ $role->name }}</span>
+                @empty
+                    <span class="recovery-role">no role</span>
+                @endforelse
+            </div>
         </div>
-      </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        @forelse($user->roles as $role)
-          <span class="role-badge role-{{ $role->name }}">{{ $role->name }}</span>
-        @empty
-          <span class="role-badge" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.1);">no role</span>
-        @endforelse
-      </div>
+        <div class="recovery-card__body">
+            <form method="POST" action="{{ url('/recovery/'.$user->id.'/reset') }}" class="recovery-form">
+                @csrf
+                <input type="password" name="password" placeholder="New password (min 6 chars)" required minlength="6">
+                <button type="submit">Reset Password</button>
+            </form>
+        </div>
     </div>
-    <div class="card-body">
-      <form method="POST" action="{{ url('/recovery/'.$user->id.'/reset') }}">
-        @csrf
-        <input type="password" name="password" placeholder="Enter new password (min 6 chars)" required minlength="6">
-        <button type="submit">Reset Password</button>
-      </form>
-    </div>
-  </div>
-  @endforeach
+    @endforeach
 
-  <div class="footer-note">QPOS Recovery Tool &mdash; Alkyne Solutions</div>
+    <div class="recovery-footer">{{ readConfig('studio_name') ?? 'QPOS' }} Recovery Tool</div>
 </div>
 </body>
 </html>
