@@ -1,103 +1,116 @@
 @extends('backend.master')
 
-@section('title', 'Sale Report')
+@section('title', 'Sale Summary')
 
 @section('content')
-<div class="card">
-  <div class="mt-n5 mb-3 d-flex justify-content-end">
-    <div class="form-group">
-      <div class="input-group">
-        <button type="button" class="btn btn-default float-right" id="daterange-btn">
-          <i class="far fa-calendar-alt"></i> Filter by date
-          <i class="fas fa-caret-down"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-  <div class="card-body p-2 p-md-4 pt-0">
-    <div class="row g-4">
-      <div class="col-md-12">
-        <div class="card-body p-0">
-          <section class="invoice">
-            <!-- info row -->
-            <div class="row invoice-info">
-              <div class="col-sm-4">
-              </div>
-              <!-- /.col -->
-              <div class="col-sm-4">
-                <address>
-                  <strong>Sale Summery ({{$start_date}} - {{$end_date}})</strong><br>
-                </address>
-              </div>
-              <!-- /.col -->
-              <div class="col-sm-2">
-              </div>
-              <!-- /.col -->
-            </div>
-            <!-- /.row -->
+@php
+    $symbol = currency() ? currency()->symbol : '$';
+    $formatMoney = fn ($amount) => $symbol . ' ' . number_format((float) $amount, 2);
+@endphp
 
-            <!-- Table row -->
-            <div class="row justify-content-center">
-              <div class="col-10">
-                <div class="table-responsive">
-                  <table class="table">
-                    <tr>
-                      <th style="width:50%">Subtotal:</th>
-                      <td class="text-right">{{ currency() ? currency()->symbol : '$' }} {{number_format((float)$sub_total,2)}}</td>
-                    </tr>
-                    <tr>
-                      <th>Total Discount:</th>
-                      <td class="text-right">{{ currency() ? currency()->symbol : '$' }} {{number_format((float)$discount,2)}}</td>
-                    </tr>
-                    <tr>
-                      <th>Total Sold:</th>
-                      <td class="text-right">{{ currency() ? currency()->symbol : '$' }} {{number_format((float)$total,2)}}</td>
-                    </tr>
-                    <tr>
-                      <th>Customer Paid:</th>
-                      <td class="text-right">{{ currency() ? currency()->symbol : '$' }} {{number_format((float)$paid,2)}}</td>
-                    </tr>
-                    <tr>
-                      <th>Customer Due:</th>
-                      <td class="text-right">{{ currency() ? currency()->symbol : '$' }} {{number_format((float)$due,2)}}</td>
-                    </tr>
-                  </table>
+<x-report-card title="Sale Summary" icon="fas fa-chart-pie">
+    <x-slot:filters>
+        <x-date-range-filter id="daterange-btn" />
+    </x-slot:filters>
+
+    <x-slot:stats>
+        <div class="col-sm-6 col-xl-3">
+            <div class="report-kpi">
+                <span class="report-kpi__icon report-kpi__icon--blue"><i class="fas fa-receipt"></i></span>
+                <div>
+                    <span class="report-kpi__label">Subtotal</span>
+                    <span class="report-kpi__value">{{ $formatMoney($sub_total) }}</span>
                 </div>
-              </div>
-              <!-- /.col -->
             </div>
-            <!-- /.row -->
-            <div class="row no-print">
-              <div class="col-12">
-                <button type="button" onclick="window.print()" class="btn btn-success float-right"><i class="fas fa-print"></i> Print</a>
-                </button>
-              </div>
-            </div>
-            <!-- /.row -->
-          </section>
         </div>
-      </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="report-kpi">
+                <span class="report-kpi__icon report-kpi__icon--violet"><i class="fas fa-percent"></i></span>
+                <div>
+                    <span class="report-kpi__label">Total Discount</span>
+                    <span class="report-kpi__value">{{ $formatMoney($discount) }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="report-kpi">
+                <span class="report-kpi__icon report-kpi__icon--green"><i class="fas fa-shopping-cart"></i></span>
+                <div>
+                    <span class="report-kpi__label">Total Sold</span>
+                    <span class="report-kpi__value">{{ $formatMoney($total) }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="report-kpi">
+                <span class="report-kpi__icon report-kpi__icon--amber"><i class="fas fa-clock"></i></span>
+                <div>
+                    <span class="report-kpi__label">Customer Due</span>
+                    <span class="report-kpi__value">{{ $formatMoney($due) }}</span>
+                </div>
+            </div>
+        </div>
+    </x-slot:stats>
+
+    <div class="report-summary">
+        <div class="report-summary__meta">
+            <span class="report-summary__period">
+                <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                {{ $start_date }} – {{ $end_date }}
+            </span>
+        </div>
+
+        <dl class="report-summary__list">
+            <div class="report-summary__row">
+                <dt>Subtotal</dt>
+                <dd>{{ $formatMoney($sub_total) }}</dd>
+            </div>
+            <div class="report-summary__row">
+                <dt>Total Discount</dt>
+                <dd class="report-summary__value--discount">{{ $formatMoney($discount) }}</dd>
+            </div>
+            <div class="report-summary__row report-summary__row--highlight">
+                <dt>Total Sold</dt>
+                <dd>{{ $formatMoney($total) }}</dd>
+            </div>
+            <div class="report-summary__row">
+                <dt>Customer Paid</dt>
+                <dd class="report-summary__value--paid">{{ $formatMoney($paid) }}</dd>
+            </div>
+            <div class="report-summary__row report-summary__row--due{{ (float) $due > 0 ? ' report-summary__row--due-active' : '' }}">
+                <dt>Customer Due</dt>
+                <dd>{{ $formatMoney($due) }}</dd>
+            </div>
+        </dl>
+
+        <div class="report-summary__footer no-print">
+            <button type="button" onclick="window.print()" class="btn btn-modern btn-modern--primary">
+                <i class="fas fa-print"></i> Print Summary
+            </button>
+        </div>
     </div>
-  </div>
-</div>
+</x-report-card>
 @endsection
 
-@push('style')
-<style>
-  .invoice {
-    border: none !important;
-  }
-</style>
-@endpush
 @push('script')
 <script>
+  function setDateRangeFilterLabel($btn, start, end) {
+    $btn.find('.date-range-filter__value').text(
+      start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY')
+    );
+    $btn.addClass('date-range-filter--has-value');
+  }
+
   $(function() {
     const urlParams = new URLSearchParams(window.location.search);
-    const startDate = urlParams.get('start_date') || moment().subtract(29, 'days').format('YYYY-MM-DD'); // Default to last 30 days if not present
-    const endDate = urlParams.get('end_date') || moment().format('YYYY-MM-DD'); // Default to today if not present
+    const startDate = urlParams.get('start_date') || moment().subtract(29, 'days').format('YYYY-MM-DD');
+    const endDate = urlParams.get('end_date') || moment().format('YYYY-MM-DD');
+    const $btn = $('#daterange-btn');
+    const startMoment = moment(startDate, 'YYYY-MM-DD');
+    const endMoment = moment(endDate, 'YYYY-MM-DD');
 
-    //Date range as a button
-    $('#daterange-btn').daterangepicker({
+    $btn.daterangepicker({
+        opens: 'left',
         ranges: {
           'Today': [moment(), moment()],
           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -106,14 +119,16 @@
           'This Month': [moment().startOf('month'), moment().endOf('month')],
           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
         },
-        startDate: moment(startDate, "YYYY-MM-DD"),
-        endDate: moment(endDate, "YYYY-MM-DD")
+        startDate: startMoment,
+        endDate: endMoment
       },
       function(start, end) {
-        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
+        setDateRangeFilterLabel($btn, start, end);
         window.location.href = '{{ route("backend.admin.sale.summery") }}?start_date=' + start.format('YYYY-MM-DD') + '&end_date=' + end.format('YYYY-MM-DD');
       }
-    )
-  })
+    );
+
+    setDateRangeFilterLabel($btn, startMoment, endMoment);
+  });
 </script>
 @endpush
