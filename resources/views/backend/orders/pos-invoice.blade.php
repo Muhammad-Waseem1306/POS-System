@@ -2,7 +2,7 @@
 @section('title', 'Receipt_'.$order->id)
 @section('content')
 
-<div class="card">
+<div class="content-card">
   <!-- Main content -->
   <div class="receipt-container mt-0" id="printable-section" style="max-width: {{ $maxWidth}}; font-size: 12px; font-family: 'Courier New', Courier, monospace;">
     <div class="text-center">
@@ -107,7 +107,7 @@
 
   <!-- Print Button -->
   <div class="text-center mt-3 no-print pb-3">
-    <button type="button" onclick="window.print()" class="btn bg-gradient-primary text-white"><i class="fas fa-print"></i> Print</button>
+    <button type="button" onclick="window.print()" class="btn btn-modern btn-modern--primary text-white"><i class="fas fa-print"></i> Print</button>
   </div>
 </div>
 @endsection

@@ -1,7 +1,7 @@
 @extends('backend.master')
 @section('title', 'Collection_Invoice_'.$transaction->id)
 @section('content')
-<div class="card">
+<div class="content-card">
   <div class="card-body">
     <!-- Main content -->
     <section class="invoice">
@@ -74,7 +74,7 @@
       <!-- Table row -->
       <div class="row">
         <div class="col-12 table-responsive">
-          <table class="table table-striped">
+          <table class="table table-modern table-striped">
             <thead>
               <tr>
                 <th>SN</th>
@@ -151,8 +151,9 @@
         <!-- /.col -->
       </div>
       <div class="row no-print">
-        <div class="col-12">
-          <button type="button" onclick="window.print()" class="btn btn-success float-right"><i class="fas fa-print"></i> Print</a>
+        <div class="col-12 text-end">
+          <button type="button" onclick="window.print()" class="btn btn-modern btn-modern--primary">
+            <i class="fas fa-print"></i> Print
           </button>
         </div>
       </div>
@@ -167,6 +168,16 @@
 <style>
   .invoice {
     border: none !important;
+  }
+
+  @media print {
+    .no-print,
+    .main-header,
+    .main-sidebar,
+    .main-footer,
+    .content-header {
+      display: none !important;
+    }
   }
 </style>
 @endpush
