@@ -1,56 +1,57 @@
 /* ========= theme ========== */
 .sidebar-dark-lightblue .nav-sidebar>.nav-item>.nav-link.active,
 .sidebar-light-lightblue .nav-sidebar>.nav-item>.nav-link.active {
-    background-color: #8b9ee9 !important;
+    background-color: rgba(37, 99, 235, 0.1) !important;
+    color: #1d4ed8 !important;
 }
 
 .text-lightblue {
-    color: #6982e6 !important;
+    color: #2563eb !important;
 }
 
 .bg-gradient-primary {
-    background: #4a6aeb linear-gradient(180deg, #8b9ee9, #778ee9) repeat-x !important;
+    background: #2563eb linear-gradient(180deg, #3b82f6, #2563eb) repeat-x !important;
 }
 
 .bg-gradient-primary.btn:hover {
-    background: #2a3b81 linear-gradient(180deg, #6a78b1, #48568d) repeat-x !important;
-    border-color: #6a78b1 !important;
+    background: #1d4ed8 linear-gradient(180deg, #2563eb, #1d4ed8) repeat-x !important;
+    border-color: #1d4ed8 !important;
 }
 
 .bg-primary {
-    background: #8b9ee9 !important;
+    background: #2563eb !important;
 }
 
 .btn-lightblue {
-    color: #8b9ee9 !important;
+    color: #2563eb !important;
 }
 
 a {
-    color: #162c83;
+    color: #1e40af;
 }
 
 .btn-lightblue:hover {
-    background: #2a3b81 linear-gradient(180deg, #6a78b1, #48568d) repeat-x !important;
-    border-color: #070808 !important;
+    background: #1d4ed8 linear-gradient(180deg, #2563eb, #1d4ed8) repeat-x !important;
+    border-color: #1e3a8a !important;
 }
 
 .sidebar-light-lightblue {
-    background-color: #b9c6fb !important;
+    background-color: #f8fafc !important;
     box-shadow: none !important;
 }
 
 body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .content-wrapper,
 body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .main-footer,
 body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .main-header {
-    background-color: aliceblue !important;
+    background-color: #f8fafc !important;
 }
 
 .elevation-3 {
-    background: aliceblue !important;
+    background: #f8fafc !important;
 }
 
 .preloader {
-    background-color: aliceblue !important;
+    background-color: #f8fafc !important;
 }
 
 /* ========= theme end ========== */
@@ -61,50 +62,7 @@ body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .main-head
     max-height: 80px;
 }
 
-.user-cart {
-    .card {
-        height: 400px;
-    }
-
-    .qty {
-        width: 45px;
-        float: left;
-    }
-}
-
-.order-product {
-    .item {
-        float: left;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-        background: #fff;
-        margin: 0 2px 4px 2px;
-
-        img {
-            width: 100px;
-            height: 100px;
-            max-width: 100%;
-        }
-
-        h5 {
-            font-size: 13px;
-            text-align: center;
-        }
-    }
-}
-
-.product-list {
-    .product-img {
-        max-width: 70px;
-        max-height: 70px;
-    }
-}
-/* for fixing select2 input field desgine issue */
- .select2-container--default .select2-selection--single {
-     height: calc(1.5em + 0.75rem + 2px) !important;
- }
-
-
+/* POS styles moved to pos-modern.css */
 /* Custom large size for the switch toggle */
 .switch {
     position: relative;
@@ -150,11 +108,11 @@ body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .main-head
 }
 
 input:checked+.slider {
-    background-color: #667fe4;
+    background-color: #2563eb;
 }
 
 input:focus+.slider {
-    box-shadow: 0 0 1px #667fe4;
+    box-shadow: 0 0 1px #2563eb;
 }
 
 input:checked+.slider:before {
